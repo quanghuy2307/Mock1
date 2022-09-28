@@ -1,0 +1,17 @@
+{
+  "name": "mock1",
+  "version": "1.0.0",
+  "description": "Project of FPT Training",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Huy Le",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  },
+  "dependencies": {
+    "express": "^4.18.1"
+  }
+}
