@@ -27,16 +27,16 @@ router.use('/home', (req, res, next) => {
 });
 
 router.post('/register', async (req, res, next) => {
-  const {firstName, lastName, sex, birthday, phoneNumber, address, email, password} = req.body;
+  const {fullName, sex, birthday, phoneNumber, address, email, password} = req.body;
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
   pool.query(
     `INSERT INTO 
-      users (first_name, last_name, birthday, sex, address, phone_number, email, password) 
+      users (full_name, birthday, sex, address, phone_number, email, password) 
     VALUES 
-      ($1, $2, $3, $4, $5, $6, $7, $8)`, 
-    [firstName, lastName, birthday, sex, phoneNumber, address, email, hashedPassword], 
+      ($1, $2, $3, $4, $5, $6, $7);`, 
+    [fullName, "2000-07-23", sex, phoneNumber, address, email, hashedPassword], 
     (error, results) => { 
       if (error) {
         throw error;
@@ -46,8 +46,7 @@ router.post('/register', async (req, res, next) => {
   );
   
   console.log({
-    firstName,
-    lastName,
+    fullName,
     sex,
     birthday,
     phoneNumber,
