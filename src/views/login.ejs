@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="../public/assets/imgs/Key-Icon.png" />
+
+	<!-- Title -->
+    <title>Login</title>
+
+	<!-- Bootstrap CSS v5.2.0-beta1 -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <!-- Font-awesome icons lib -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+    <header>
+
+    </header>
+
+	<main>
+		<section class="my-5 container">
+			<div class="row justify-content-center">
+				<div class="col-xxl-4 col-xl-5 col-lg-5 col-md-7 col-sm-9">
+					<div class="card shadow-lg">
+						<!-- Card header -->
+						<div class="card-header px-5 border-0">
+							<p class="card-title fs-2 fw-bold text-center"><i class="fa-solid fa-key me-1"></i>Login</p>
+						</div>
+						
+						<!-- Card body -->
+						<div class="card-body px-5 py-3">
+							<form method="post" action="/survey/dashboard">
+								<div class="input-group mb-3">
+                                    <label class="input-group-text" for="email"><i class="fa-solid fa-envelope"></i></label>
+									<input id="email" type="email" class="form-control" name="email" placeholder="Email" required>
+								</div>
+
+								<div class="input-group mb-3">
+                                    <label class="input-group-text" for="password"><i class="fa-solid fa-key"></i></label>
+									<input id="password" type="password" class="form-control" name="password" placeholder="Password" required>
+								</div>
+
+								<div class="text-end mb-3">
+									<a href="/survey/forgot" class="text-decoration-none">Forgot Password?</a>
+								</div>
+
+								<div class="d-flex justify-content-between">
+									<div class="form-check">
+										<input type="checkbox" name="rememberMe" class="form-check-input" id="rememberMe">
+										<label for="rememberMe" class="form-check-label">Remember me</label>
+									</div>
+
+									<div>
+										<button type="submit" name="login" class="btn btn-primary">Login</button>
+									</div>
+								</div>
+							</form>
+						</div>
+
+						<!-- Card footer -->
+						<div class="card-footer py-3 border-0">
+							<div class="text-center">
+								Don't have an account?<a href="/survey/register" class="text-decoration-none"> Create One</a>
+								<br>
+								You are Admin?<a href="/survey/admin/login" class="text-decoration-none"> Login as Admin</a>
+							</div>
+						</div>
+					</div>
+
+					<div class="text-center mt-5">
+                        <a href="/survey/home" class="text-decoration-none"><i class="fa-solid fa-arrow-left me-1"></i>Back to Homepage.</a>
+					</div>
+				</div>
+			</div>
+		</section>
+	</main>
+
+    <footer>
+        
+    </footer>
+
+	<!-- Bootstrap JavaScript Libraries -->
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js" integrity="sha384-Xe+8cL9oJa6tN/veChSP7q+mnSPaj5Bcu9mPX5F5xIGE0DVittaqT5lorf0EI7Vk" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.min.js" integrity="sha384-kjU+l4N0Yf4ZOJErLsIcvOU2qSb74wXpOhqTvwVx3OElZRweTnQ6d31fXEoRD1Jy" crossorigin="anonymous"></script>
+</body>
+</html>
