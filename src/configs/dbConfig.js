@@ -9,17 +9,4 @@ const pool = new Pool({
   port: process.env.DB_PORT
 });
 
-async function poolDemo() {
-  const now = await pool.query("SELECT NOW()");
-  await pool.end();
-
-  return now;
-}
-
-// Test connect to DB
-(async () => {
-  const poolResult = await poolDemo();
-  console.log("Time with pool: " + poolResult.rows[0]["now"]);
-})();
-
 export { pool };

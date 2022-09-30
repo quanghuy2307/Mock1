@@ -31,14 +31,19 @@ router.post('/register', async (req, res, next) => {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  // await pool.query('INSERT INTO users (first_name, last_name, birthday, sex, address, phone_number, email, password) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)', 
-  //   [firstName, lastName, sex, birthday, phoneNumber, address, email, hashedPassword], 
-  //   (error, results) => {
-  //     if (error) {
-  //       throw error;
-  //     }
-  //     response.status(200).json(results.rows);
-  //   });
+  pool.query(
+    `INSERT INTO 
+      users (first_name, last_name, birthday, sex, address, phone_number, email, password) 
+    VALUES 
+      ($1, $2, $3, $4, $5, $6, $7, $8)`, 
+    [firstName, lastName, birthday, sex, phoneNumber, address, email, hashedPassword], 
+    (error, results) => { 
+      if (error) {
+        throw error;
+      }
+      res.status(200).json(results.rows);
+    }
+  );
   
   console.log({
     firstName,
@@ -52,7 +57,7 @@ router.post('/register', async (req, res, next) => {
     hashedPassword
   });
 
-  res.end();
+  res.end('');
 });
 
 // Gắn router vào app với prefix của url là /survey
