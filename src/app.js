@@ -16,9 +16,12 @@ app.use(express.json());
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "/views"));
 
+/*  */
 const authRouter = require("./routes/auth.route");
+const userRouter = require("./routes/user.route");
 
 /*  */
 app.use("/survey/auth", authRouter);
+app.use("/survey/user", userRouter);
 
 app.listen(process.env.PORT, () => console.log(`App listening at localhost:${process.env.PORT}`));

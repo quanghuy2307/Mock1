@@ -8,6 +8,7 @@ authRouter.get("/registerAccount", authController.getRegisterAccount);
 // authRouter.post("/loginAccount", authController.postLoginAccount);
 authRouter.get("/loginAccount", authController.getLoginAccount);
 // authRouter.post("/logout", authController.logout);
+// authRouter.post("/forgotAccount", authController.postForgotAccount);
 authRouter.get("/forgotAccount", authController.getForgotAccount);
 
 module.exports = authRouter;

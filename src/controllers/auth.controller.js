@@ -31,11 +31,19 @@ const authController = {
     res.render("register");
   },
 
+  // postLoginAccount: (req, res, next) => {
+
+  // },
+
   getLoginAccount: (req, res, next) => {
     res.render("login");
   },
 
   // logout: async (req, res, next) => {},
+
+  // postForgotAccount: (req, res, next) => {
+
+  // },
 
   getForgotAccount: (req, res, next) => {
     res.render("forgot");
