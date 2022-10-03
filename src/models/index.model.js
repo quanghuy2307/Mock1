@@ -1,63 +1,11 @@
 const sequelize = require("../configs/db.config");
-
-const Users = require("./user.model");
-const Results = require("./results.model");
-const Questions = require("./questions.model");
-const Options = require("./options.model");
-const UserQuestions = require("./user_questions.model");
-const UserOptions = require("./user_options.model");
-const TokenRefreshes = require("./token_refreshes.model");
-const TokenAccesses = require("./token_accesses.model");
-
-/*  */
-Users.hasOne(Results, {
-  foreignKey: "userId",
-});
-
-/*  */
-Questions.hasMany(Options, {
-  foreignKey: "questionId",
-});
-
-/*  */
-Users.hasMany(TokenRefreshes, {
-  foreignKey: "userId",
-});
-
-/*  */
-Users.hasMany(TokenAccesses, {
-  foreignKey: "userId",
-});
-
-/*  */
-TokenRefreshes.hasMany(TokenAccesses, {
-  foreignKey: "tokenRefreshId",
-});
-
-/*  */
-Users.hasMany(UserQuestions, {
-  foreignKey: "userId",
-});
-
-/*  */
-Users.hasMany(UserOptions, {
-  foreignKey: "userId",
-});
-
-/*  */
-Questions.hasMany(UserQuestions, {
-  foreignKey: "questionId",
-});
-
-/*  */
-Questions.hasMany(UserOptions, {
-  foreignKey: "questionId",
-});
-
-/*  */
-Options.hasMany(UserOptions, {
-  foreignKey: "optionId",
-});
+const User = require("./user.model");
+const Result = require("./result.model");
+const Question = require("./question.model");
+const Option = require("./option.model");
+const UserQuestion = require("./user_question.model");
+const UserOption = require("./user_option.model");
+const Token = require("./token.model");
 
 sequelize
   .sync({ force: true })

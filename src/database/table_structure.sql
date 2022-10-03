@@ -1,4 +1,3 @@
--- DROP TABLE "options", "questions", "results", "token_accesses", "token_refreshes", "user_options", "user_questions", "users";
 -- DROP TABLE "Options", "Questions", "Results", "TokenAccesses", "TokenRefreshes", "UserOptions", "UserQuestions", "Users";
 
 CREATE TABLE IF NOT EXISTS "users" (

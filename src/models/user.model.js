@@ -1,16 +1,20 @@
 const sequelize = require("../configs/db.config");
 const { DataTypes } = require("sequelize");
+const Result = require("./result.model");
+const UserQuestion = require("./user_question.model");
+const UserOption = require("./user_option.model");
+const Token = require("./token.model");
 
-const Users = sequelize.define(
-  "Users",
+const User = sequelize.define(
+  "User",
   {
-    userId: {
+    id: {
       type: DataTypes.BIGINT,
       primaryKey: true,
       autoIncrement: true,
       allowNull: false,
     },
-    fullName: {
+    full_name: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -19,15 +23,15 @@ const Users = sequelize.define(
       allowNull: false,
     },
     sex: {
-      type: DataTypes.STRING, // Male/Female/Others
+      type: DataTypes.STRING(6), // Male/Female/Others
       allowNull: false,
     },
     address: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    phoneNumber: {
-      type: DataTypes.STRING,
+    phone: {
+      type: DataTypes.STRING(10),
       allowNull: false,
     },
     email: {
@@ -35,21 +39,43 @@ const Users = sequelize.define(
       unique: true,
       allowNull: false,
     },
-    hashedPassword: {
+    hashed_password: {
       type: DataTypes.TEXT,
       allowNull: false,
     },
-    updatedAt: {
+    role: {
+      type: DataTypes.ENUM("user", "admin"), // user/admin
+      defaultValue: "user",
+      allowNull: false,
+    },
+    updated_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
       allowNull: false,
     },
-    createdAt: {
+    created_at: {
       type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
       allowNull: false,
     },
   },
-  {}
+  {
+    timestamps: false,
+  }
 );
 
-module.exports = Users;
+/*  */
+User.hasOne(Result, {
+  foreignKey: "user_id",
+});
+User.hasMany(Token, {
+  foreignKey: "user_id",
+});
+User.hasMany(UserQuestion, {
+  foreignKey: "user_id",
+});
+User.hasMany(UserOption, {
+  foreignKey: "user_id",
+});
+
+module.exports = User;
