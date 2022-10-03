@@ -14,12 +14,10 @@ const Option = sequelize.define(
     question_id: {
       type: DataTypes.BIGINT,
       allowNull: false,
-      unique: true,
     },
     content: {
       type: DataTypes.TEXT,
       allowNull: false,
-      unique: true,
     },
     is_correct: {
       type: DataTypes.BOOLEAN, // yes/no
@@ -33,6 +31,12 @@ const Option = sequelize.define(
     },
   },
   {
+    indexes: [
+      {
+        unique: true,
+        fields: ["question_id", "content"],
+      },
+    ],
     timestamps: false,
   }
 );
