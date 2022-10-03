@@ -6,7 +6,7 @@ VALUES
     ('Tran Thuyet', '2000-07-23', 'Male', 'Hai Duong', '0912861512', 'thuyetmt23072000@gmail.com', '$2b$10$2GmcJ8xVPdpxHx81ObORq.9JJTz67LXxpbMN8vBSUFC4oUQSFp/Ia'), 
     ('Nguyen Hoang', '1999-07-23', 'Male', 'Bac Giang', '0823968976', 'hoangnn23071999@gmail.com', '$2b$10$3KWpUfuSfvA1lC3bxXaIW.6jI2x174uWWecekGcaKNq4VnedJVIPG'), 
     ('Tran Huy', '2000-07-23', 'Male', 'Ha Noi', '0966006240', 'huytq23072000@gmail.com', '$2b$10$dfvWYG0eUe8zveChFkvcwuH4Wl3xb1sdnhWcqq6yyFySnOxL41pGe'), 
-    ('Trieu Vy', '2000-07-23', 'Female', 'Hai Duong', '0937560555', 'vyth14092000@gmail.com', '$2b$10$gwHa8AOLC8wjBSpMWlC4OOXzZ4jvAgxO/NukVKR5vfWbLqsUZGO06'), 
+    ('Trieu Vy', '2000-09-14', 'Female', 'Hai Duong', '0937560555', 'vyth14092000@gmail.com', '$2b$10$gwHa8AOLC8wjBSpMWlC4OOXzZ4jvAgxO/NukVKR5vfWbLqsUZGO06'),
     ('Kieu Phuong', '2000-07-23', 'Male', 'Ha Noi', '0969044253', 'phuongkd01012000@gmail.com', '$2b$10$0H2BBnT9xjzBIJBKzhfrIOG9ME6U2BJp/ZoxdNa.8Lzv20DL7Y8Ou'), 
     ('Kieu Ngoc', '2000-07-23', 'Male', 'Ha Noi', '0989662185', 'ngockt23072000@gmail.com', '$2b$10$6rTQIyzvdW.6Bdow.PZCJ.B6gFYfYh1q8C4moR/Uc91fU9ihHLPOy'), 
     ('Phung Duc', '2000-07-23', 'Male', 'Ha Noi', '0337560589', 'ducpm23072000@gmail.com', '$2b$10$Btw8unq/LayOyeBDtcV9Ouj7VMDiJ8aLXjD/cStIapzaKgIGfnTwC'), 

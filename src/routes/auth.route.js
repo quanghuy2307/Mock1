@@ -3,12 +3,9 @@ const authController = require("../controllers/auth.controller");
 
 const authRouter = express.Router();
 
-authRouter.post("/registerAccount", authController.postRegisterAccount);
-authRouter.get("/registerAccount", authController.getRegisterAccount);
-// authRouter.post("/loginAccount", authController.postLoginAccount);
-authRouter.get("/loginAccount", authController.getLoginAccount);
-// authRouter.post("/logout", authController.logout);
-// authRouter.post("/forgotAccount", authController.postForgotAccount);
-authRouter.get("/forgotAccount", authController.getForgotAccount);
+authRouter.post("/register", authController.registerAccount);
+authRouter.post("/login", authController.login);
+authRouter.post("/logout", authController.logout);
+authRouter.post("/forgot", authController.forgotAccount);
 
 module.exports = authRouter;

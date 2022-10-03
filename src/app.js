@@ -9,6 +9,7 @@ const app = express();
 /*  */
 app.use(express.static(path.join(__dirname, "/public")));
 app.use(express.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(express.json());
 
@@ -22,6 +23,6 @@ const userRouter = require("./routes/user.route");
 
 /*  */
 app.use("/survey/auth", authRouter);
-app.use("/survey/user", userRouter);
+app.use("/survey/users", userRouter);
 
 app.listen(process.env.PORT, () => console.log(`App listening at localhost:${process.env.PORT}`));
