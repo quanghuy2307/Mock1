@@ -15,7 +15,7 @@ const userController = {
     const user = await User.findOne({
       attributes: ["id", "full_name", "birthday", "sex", "address", "phone", "email", "role", "updated_at", "created_at"],
       where: {
-        id: req.params.id,
+        id: parseInt(req.params.id),
       },
     });
 
@@ -23,13 +23,13 @@ const userController = {
   },
 
   updateUserById: async (req, res, next) => {
-    const { fullName, birthday, sex, address, phone, email, password, role } = req.body;
+    const { full_name, birthday, sex, address, phone, email, password, role } = req.body;
 
-    hashedPassword = bcrypt.hashSync(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     await User.update(
       {
-        full_name: fullName,
+        full_name: full_name,
         birthday: birthday,
         sex: sex,
         address: address,
@@ -40,7 +40,7 @@ const userController = {
       },
       {
         where: {
-          id: req.params.id,
+          id: parseInt(req.params.id),
         },
       }
     );
@@ -51,7 +51,7 @@ const userController = {
   deleteUserById: async (req, res, next) => {
     await User.destroy({
       where: {
-        id: req.params.id,
+        id: parseInt(req.params.id),
       },
     });
 

@@ -1,7 +1,5 @@
-const express = require("express");
+const resultRouter = require("express").Router();
 const { resultController } = require("../controllers/index");
-
-const resultRouter = express.Router();
 
 // resultRouter.post("/", resultController.createResult);
 // resultRouter.get("/", resultController.getAllResult);

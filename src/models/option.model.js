@@ -24,11 +24,6 @@ const Option = sequelize.define(
       defaultValue: "no",
       allowNull: false,
     },
-    updated_at: {
-      type: Sequelize.DATE,
-      defaultValue: Sequelize.fn("NOW"),
-      allowNull: false,
-    },
   },
   {
     indexes: [

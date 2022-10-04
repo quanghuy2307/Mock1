@@ -25,6 +25,11 @@ const Question = sequelize.define(
       defaultValue: Sequelize.fn("NOW"),
       allowNull: false,
     },
+    created_at: {
+      type: Sequelize.DATE,
+      defaultValue: Sequelize.fn("NOW"),
+      allowNull: false,
+    },
   },
   {
     timestamps: false,

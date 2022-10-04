@@ -11,41 +11,41 @@ const questionController = {
       score: parseInt(score),
     });
 
-    const questionId = parseInt(ques.id);
-
     options.forEach(async (currentValue, index, arr) => {
       await Option.create({
         content: currentValue.content,
-        is_true: currentValue.isTrue,
-        question_id: questionId,
+        is_true: currentValue.is_true,
+        question_id: parseInt(ques.id),
       });
     });
 
-    return res.status(200).json({ message: "Successfully.", data: { id: questionId } });
+    return res.status(200).json({ message: "Successfully.", data: { id: ques.id } });
   },
 
   getAllQuestion: async (req, res, next) => {
-    return res.status(200).json({ message: "Successfully.", data: {} });
+    const allQuestion = await Question.findAll({
+      include: [Option],
+    });
+
+    return res.status(200).json({ message: "Successfully.", data: allQuestion });
   },
 
   getQuestionById: async (req, res, next) => {
-    const questionId = parseInt(req.params.id);
-
     const question = await Question.findOne({
-      attributes: ["content", "score"],
+      attributes: ["content", "score", "updated_at", "created_at"],
       where: {
-        id: questionId,
+        id: parseInt(req.params.id),
       },
     });
 
     const options = await Option.findAll({
       attributes: ["content", "is_true"],
       where: {
-        question_id: questionId,
+        question_id: parseInt(req.params.id),
       },
     });
 
-    return res.status(200).json({ message: "Successfully.", data: { id: questionId, question: question.content, score: parseInt(question.score), options: options } });
+    return res.status(200).json({ message: "Successfully.", data: { id: req.params.id, question: question.content, score: question.score, options: options, updated_at: question.updated_at, created_at: question.created_at } });
   },
 
   updateQuestionById: async (req, res, next) => {
@@ -89,11 +89,9 @@ const questionController = {
   },
 
   deleteQuestionById: async (req, res, next) => {
-    const questionId = parseInt(req.params.id);
-
     await Question.destroy({
       where: {
-        id: questionId,
+        id: parseInt(req.params.id),
       },
     });
 
