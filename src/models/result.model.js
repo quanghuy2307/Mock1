@@ -45,4 +45,13 @@ const Result = sequelize.define(
   }
 );
 
+(async function () {
+  await sequelize.sync(/*{ alter: true }*/).then(() => {
+    console.log("Sync Results Table success!");
+  });
+})().catch((err) => {
+  console.log("Sync Results Table fail!");
+  console.log(err);
+});
+
 module.exports = Result;

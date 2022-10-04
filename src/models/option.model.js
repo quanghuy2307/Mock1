@@ -1,6 +1,6 @@
 const sequelize = require("../configs/db.config");
 const { DataTypes } = require("sequelize");
-const UserOption = require("./user_option.model");
+const { UserOption } = require("./index");
 
 const Option = sequelize.define(
   "Option",
@@ -44,6 +44,19 @@ const Option = sequelize.define(
 /*  */
 Option.hasMany(UserOption, {
   foreignKey: "option_id",
+});
+// UserOption.belongsTo(Option, {
+//   foreignKey: "option_id",
+//   targetKey: "id",
+// });
+
+(async function () {
+  await sequelize.sync(/*{ alter: true }*/).then(() => {
+    console.log("Sync Options Table success!");
+  });
+})().catch((err) => {
+  console.log("Sync Options Table fail!");
+  console.log(err);
 });
 
 module.exports = Option;

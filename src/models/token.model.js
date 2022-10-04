@@ -37,4 +37,13 @@ const Token = sequelize.define(
   }
 );
 
+(async function () {
+  await sequelize.sync(/*{ alter: true }*/).then(() => {
+    console.log("Sync Tokens Table success!");
+  });
+})().catch((err) => {
+  console.log("Sync Tokens Table fail!");
+  console.log(err);
+});
+
 module.exports = Token;

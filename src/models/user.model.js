@@ -1,9 +1,6 @@
 const sequelize = require("../configs/db.config");
 const { DataTypes } = require("sequelize");
-const Result = require("./result.model");
-const UserQuestion = require("./user_question.model");
-const UserOption = require("./user_option.model");
-const Token = require("./token.model");
+const { Result, UserQuestion, UserOption, Token } = require("./index");
 
 const User = sequelize.define(
   "User",
@@ -68,14 +65,39 @@ const User = sequelize.define(
 User.hasOne(Result, {
   foreignKey: "user_id",
 });
+// Result.belongsTo(User, {
+//   foreignKey: "user_id",
+//   targetKey: "id",
+// });
 User.hasMany(Token, {
   foreignKey: "user_id",
 });
+// Token.belongsTo(User, {
+//   foreignKey: "user_id",
+//   targetKey: "id",
+// });
 User.hasMany(UserQuestion, {
   foreignKey: "user_id",
 });
+// UserQuestion.belongsTo(User, {
+//   foreignKey: "user_id",
+//   targetKey: "id",
+// });
 User.hasMany(UserOption, {
   foreignKey: "user_id",
+});
+// UserOption.belongsTo(User, {
+//   foreignKey: "user_id",
+//   targetKey: "id",
+// });
+
+(async function () {
+  await sequelize.sync(/*{ alter: true }*/).then(() => {
+    console.log("Sync Users Table success!");
+  });
+})().catch((err) => {
+  console.log("Sync Users Table fail!");
+  console.log(err);
 });
 
 module.exports = User;

@@ -1,4 +1,4 @@
--- DROP TABLE "Options", "Questions", "Results", "TokenAccesses", "TokenRefreshes", "UserOptions", "UserQuestions", "Users";
+-- DROP TABLE "Options", "Questions", "Results", Tokens", "UserOptions", "UserQuestions", "Users";
 
 CREATE TABLE IF NOT EXISTS "users" (
     "user_id" SERIAL, 

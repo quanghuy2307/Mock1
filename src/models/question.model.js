@@ -1,8 +1,6 @@
 const sequelize = require("../configs/db.config");
 const { DataTypes } = require("sequelize");
-const Option = require("./option.model");
-const UserQuestion = require("./user_question.model");
-const UserOption = require("./user_option.model");
+const { Option, UserQuestion, UserOption } = require("./index");
 
 const Question = sequelize.define(
   "Question",
@@ -37,11 +35,32 @@ const Question = sequelize.define(
 Question.hasMany(Option, {
   foreignKey: "question_id",
 });
+// Option.belongsTo(Question, {
+//   foreignKey: "question_id",
+//   targetKey: "id",
+// });
 Question.hasMany(UserQuestion, {
   foreignKey: "question_id",
 });
+// UserQuestion.belongsTo(Question, {
+//   foreignKey: "question_id",
+//   targetKey: "id",
+// });
 Question.hasMany(UserOption, {
   foreignKey: "question_id",
+});
+// UserOption.belongsTo(Question, {
+//   foreignKey: "question_id",
+//   targetKey: "id",
+// });
+
+(async function () {
+  await sequelize.sync(/*{ alter: true }*/).then(() => {
+    console.log("Sync Questions Table success!");
+  });
+})().catch((err) => {
+  console.log("Sync Questions Table fail!");
+  console.log(err);
 });
 
 module.exports = Question;

@@ -38,4 +38,13 @@ const UserOption = sequelize.define(
   }
 );
 
+(async function () {
+  await sequelize.sync(/*{ alter: true }*/).then(() => {
+    console.log("Sync UserOptions Table success!");
+  });
+})().catch((err) => {
+  console.log("Sync UserOptions Table fail!");
+  console.log(err);
+});
+
 module.exports = UserOption;

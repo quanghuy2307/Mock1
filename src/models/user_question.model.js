@@ -34,4 +34,13 @@ const UserQuestion = sequelize.define(
   }
 );
 
+(async function () {
+  await sequelize.sync(/*{ alter: true }*/).then(() => {
+    console.log("Sync UserQuestions Table success!");
+  });
+})().catch((err) => {
+  console.log("Sync UserQuestions Table fail!");
+  console.log(err);
+});
+
 module.exports = UserQuestion;
