@@ -1,1 +1,0 @@
-DROP TABLE "Options", "Questions", "Results", "Tokens", "UserOptions", "UserQuestions", "Users";

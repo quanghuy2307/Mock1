@@ -1,7 +1,5 @@
-const express = require("express");
+const questionRouter = require("express").Router();
 const { questionController } = require("../controllers/index");
-
-const questionRouter = express.Router();
 
 questionRouter.post("/", questionController.createQuestion);
 questionRouter.get("/", questionController.getAllQuestion);

@@ -1,31 +1,31 @@
 const sequelize = require("../configs/db.config");
-const { DataTypes } = require("sequelize");
+const { Sequelize } = require("sequelize");
 
 const UserQuestion = sequelize.define(
   "UserQuestion",
   {
     id: {
-      type: DataTypes.BIGINT,
+      type: Sequelize.BIGINT,
       primaryKey: true,
       autoIncrement: true,
       allowNull: false,
     },
     user_id: {
-      type: DataTypes.BIGINT,
+      type: Sequelize.BIGINT,
       allowNull: false,
     },
     question_id: {
-      type: DataTypes.BIGINT,
+      type: Sequelize.BIGINT,
       allowNull: false,
     },
     answer: {
-      type: DataTypes.ENUM("true", "false", "none"), // true/false/none
+      type: Sequelize.ENUM("true", "false", "none"), // true/false/none
       defaultValue: "none",
       allowNull: false,
     },
     updated_at: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
+      type: Sequelize.DATE,
+      defaultValue: Sequelize.fn("NOW"),
       allowNull: false,
     },
   },

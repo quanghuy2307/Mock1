@@ -1,32 +1,32 @@
 const sequelize = require("../configs/db.config");
-const { DataTypes } = require("sequelize");
+const { Sequelize } = require("sequelize");
 const { UserOption } = require("./index");
 
 const Option = sequelize.define(
   "Option",
   {
     id: {
-      type: DataTypes.BIGINT,
+      type: Sequelize.BIGINT,
       primaryKey: true,
       autoIncrement: true,
       allowNull: false,
     },
     question_id: {
-      type: DataTypes.BIGINT,
+      type: Sequelize.BIGINT,
       allowNull: false,
     },
     content: {
-      type: DataTypes.TEXT,
+      type: Sequelize.TEXT,
       allowNull: false,
     },
-    is_correct: {
-      type: DataTypes.BOOLEAN, // yes/no
+    is_true: {
+      type: Sequelize.BOOLEAN, // yes/no
       defaultValue: "no",
       allowNull: false,
     },
     updated_at: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
+      type: Sequelize.DATE,
+      defaultValue: Sequelize.fn("NOW"),
       allowNull: false,
     },
   },
@@ -45,10 +45,10 @@ const Option = sequelize.define(
 Option.hasMany(UserOption, {
   foreignKey: "option_id",
 });
-// UserOption.belongsTo(Option, {
-//   foreignKey: "option_id",
-//   targetKey: "id",
-// });
+UserOption.belongsTo(Option, {
+  foreignKey: "option_id",
+  targetKey: "id",
+});
 
 (async function () {
   await sequelize.sync(/*{ alter: true }*/).then(() => {

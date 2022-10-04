@@ -1,28 +1,28 @@
 const sequelize = require("../configs/db.config");
-const { DataTypes } = require("sequelize");
+const { Sequelize } = require("sequelize");
 const { Option, UserQuestion, UserOption } = require("./index");
 
 const Question = sequelize.define(
   "Question",
   {
     id: {
-      type: DataTypes.BIGINT,
+      type: Sequelize.BIGINT,
       primaryKey: true,
       autoIncrement: true,
       allowNull: false,
     },
     content: {
-      type: DataTypes.TEXT,
+      type: Sequelize.TEXT,
       allowNull: false,
       unique: true,
     },
     score: {
-      type: DataTypes.BIGINT,
+      type: Sequelize.BIGINT,
       allowNull: false,
     },
     updated_at: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
+      type: Sequelize.DATE,
+      defaultValue: Sequelize.fn("NOW"),
       allowNull: false,
     },
   },
@@ -35,24 +35,28 @@ const Question = sequelize.define(
 Question.hasMany(Option, {
   foreignKey: "question_id",
 });
-// Option.belongsTo(Question, {
-//   foreignKey: "question_id",
-//   targetKey: "id",
-// });
+Option.belongsTo(Question, {
+  foreignKey: "question_id",
+  targetKey: "id",
+});
+
+/*  */
 Question.hasMany(UserQuestion, {
   foreignKey: "question_id",
 });
-// UserQuestion.belongsTo(Question, {
-//   foreignKey: "question_id",
-//   targetKey: "id",
-// });
+UserQuestion.belongsTo(Question, {
+  foreignKey: "question_id",
+  targetKey: "id",
+});
+
+/*  */
 Question.hasMany(UserOption, {
   foreignKey: "question_id",
 });
-// UserOption.belongsTo(Question, {
-//   foreignKey: "question_id",
-//   targetKey: "id",
-// });
+UserOption.belongsTo(Question, {
+  foreignKey: "question_id",
+  targetKey: "id",
+});
 
 (async function () {
   await sequelize.sync(/*{ alter: true }*/).then(() => {

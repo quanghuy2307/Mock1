@@ -1,47 +1,47 @@
 const sequelize = require("../configs/db.config");
-const { DataTypes } = require("sequelize");
+const { Sequelize } = require("sequelize");
 
 const Result = sequelize.define(
   "Result",
   {
     id: {
-      type: DataTypes.BIGINT,
+      type: Sequelize.BIGINT,
       primaryKey: true,
       autoIncrement: true,
       allowNull: false,
     },
     user_id: {
-      type: DataTypes.BIGINT,
+      type: Sequelize.BIGINT,
       allowNull: false,
     },
     correct: {
-      type: DataTypes.BIGINT,
+      type: Sequelize.BIGINT,
       defaultValue: 0,
       allowNull: false,
     },
     incorrect: {
-      type: DataTypes.BIGINT,
+      type: Sequelize.BIGINT,
       defaultValue: 0,
       allowNull: false,
     },
     no_answer: {
-      type: DataTypes.BIGINT,
+      type: Sequelize.BIGINT,
       defaultValue: 0,
       allowNull: false,
     },
     total: {
-      type: DataTypes.BIGINT,
+      type: Sequelize.BIGINT,
       defaultValue: 0,
       allowNull: false,
     },
     score: {
-      type: DataTypes.BIGINT,
+      type: Sequelize.BIGINT,
       defaultValue: 0,
       allowNull: false,
     },
     updated_at: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
+      type: Sequelize.DATE,
+      defaultValue: Sequelize.fn("NOW"),
       allowNull: false,
     },
   },

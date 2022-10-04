@@ -1,48 +1,61 @@
 const httpStatus = require("http-status");
-const pool = require("../configs/db.config");
+const { User } = require("../models/index");
 const bcrypt = require("bcrypt");
 
 const userController = {
-  getAllUser: (req, res, next) => {
-    pool.query(`SELECT * FROM users;`, [], (error, results) => {
-      if (error) {
-        throw error.stack;
-      }
-
-      res.status(200).json({ message: "Get successfully.", data: results.rows });
+  getAllUser: async (req, res, next) => {
+    const allUser = await User.findAll({
+      attributes: ["id", "full_name", "birthday", "sex", "address", "phone", "email", "role", "updated_at", "created_at"],
     });
+
+    return res.status(200).json({ message: "Successfully.", data: allUser });
   },
 
-  getUserById: (req, res, next) => {
-    pool.query(`SELECT * FROM users WHERE user_id = $1;`, [req.params.userID], (error, results) => {
-      if (error) {
-        throw error.stack;
-      }
-
-      res.status(200).json({ message: "Get successfully.", data: results.rows[0] });
+  getUserById: async (req, res, next) => {
+    const user = await User.findOne({
+      attributes: ["id", "full_name", "birthday", "sex", "address", "phone", "email", "role", "updated_at", "created_at"],
+      where: {
+        id: req.params.id,
+      },
     });
+
+    return res.status(200).json({ message: "Successfully.", data: user });
   },
 
-  updateUser: (req, res, next) => {
-    const { fullName, sex, birthday, phoneNumber, address, email, password } = req.body;
+  updateUserById: async (req, res, next) => {
+    const { fullName, birthday, sex, address, phone, email, password, role } = req.body;
 
-    pool.query(`UPDATE TABLE users SET full_name = $1, sex = $2, birthday = $3, phone_number = $4, address = $5, email = $6, password = $7 WHERE user_id = $8 RETURNING *;`, [fullName, sex, birthday, phoneNumber, address, email, password, req.params.userID], (error, results) => {
-      if (error) {
-        throw error.stack;
+    hashedPassword = bcrypt.hashSync(password, 10);
+
+    await User.update(
+      {
+        full_name: fullName,
+        birthday: birthday,
+        sex: sex,
+        address: address,
+        phone: phone,
+        email: email,
+        hashed_password: hashedPassword,
+        role: role,
+      },
+      {
+        where: {
+          id: req.params.id,
+        },
       }
+    );
 
-      res.status(200).json({ message: "Update successfully.", data: results.rows[0] });
-    });
+    return res.status(200).json({ message: "Successfully.", data: null });
   },
 
-  deleteUser: (req, res, next) => {
-    pool.query(`DELETE FROM users WHERE user_id = $1;`, [req.params.userID], (error, results) => {
-      if (error) {
-        throw error.stack;
-      }
-
-      res.status(200).json({ message: "Delete successfully.", data: {} });
+  deleteUserById: async (req, res, next) => {
+    await User.destroy({
+      where: {
+        id: req.params.id,
+      },
     });
+
+    return res.status(200).json({ message: "Successfully.", data: null });
   },
 };
 

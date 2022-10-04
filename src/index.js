@@ -5,7 +5,6 @@ const path = require("path");
 const bodyParser = require("body-parser");
 
 const sequelize = require("./configs/db.config");
-const { Result, UserQuestion, UserOption, Token, User, Question, Options } = require("./models/index");
 
 const app = express();
 
@@ -21,13 +20,12 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "/views"));
 
 /*  */
-const authRouter = require("./routes/auth.route");
-const userRouter = require("./routes/user.route");
-const console = require("console");
+const { authRouter, userRouter, questionRouter } = require("./routes/index");
 
 /*  */
 app.use("/survey/auth", authRouter);
-app.use("/survey/users", userRouter);
+app.use("/survey/user", userRouter);
+app.use("/survey/question", questionRouter);
 
 sequelize
   .authenticate()

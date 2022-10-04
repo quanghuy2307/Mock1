@@ -1,34 +1,34 @@
 const sequelize = require("../configs/db.config");
-const { DataTypes } = require("sequelize");
+const { Sequelize } = require("sequelize");
 
 const Token = sequelize.define(
   "Token",
   {
     id: {
-      type: DataTypes.BIGINT,
+      type: Sequelize.BIGINT,
       primaryKey: true,
       autoIncrement: true,
       allowNull: false,
     },
     user_id: {
-      type: DataTypes.BIGINT,
+      type: Sequelize.BIGINT,
       allowNull: false,
     },
     content: {
-      type: DataTypes.TEXT,
+      type: Sequelize.TEXT,
       allowNull: false,
     },
     type: {
-      type: DataTypes.ENUM("access", "refresh"),
+      type: Sequelize.ENUM("access", "refresh"),
       allowNull: false,
     },
     created_at: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
+      type: Sequelize.DATE,
+      defaultValue: Sequelize.fn("NOW"),
       allowNull: false,
     },
     expired_at: {
-      type: DataTypes.DATE,
+      type: Sequelize.DATE,
       allowNull: false,
     },
   },

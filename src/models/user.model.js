@@ -1,58 +1,58 @@
 const sequelize = require("../configs/db.config");
-const { DataTypes } = require("sequelize");
+const { Sequelize } = require("sequelize");
 const { Result, UserQuestion, UserOption, Token } = require("./index");
 
 const User = sequelize.define(
   "User",
   {
     id: {
-      type: DataTypes.BIGINT,
+      type: Sequelize.BIGINT,
       primaryKey: true,
       autoIncrement: true,
       allowNull: false,
     },
     full_name: {
-      type: DataTypes.STRING,
+      type: Sequelize.STRING,
       allowNull: false,
     },
     birthday: {
-      type: DataTypes.DATE,
+      type: Sequelize.DATE,
       allowNull: false,
     },
     sex: {
-      type: DataTypes.STRING(6), // Male/Female/Others
+      type: Sequelize.STRING(6), // Male/Female/Others
       allowNull: false,
     },
     address: {
-      type: DataTypes.STRING,
+      type: Sequelize.STRING,
       allowNull: false,
     },
     phone: {
-      type: DataTypes.STRING(10),
+      type: Sequelize.STRING(10),
       allowNull: false,
     },
     email: {
-      type: DataTypes.STRING,
+      type: Sequelize.STRING,
       unique: true,
       allowNull: false,
     },
     hashed_password: {
-      type: DataTypes.TEXT,
+      type: Sequelize.TEXT,
       allowNull: false,
     },
     role: {
-      type: DataTypes.ENUM("user", "admin"), // user/admin
+      type: Sequelize.ENUM("user", "admin"), // user/admin
       defaultValue: "user",
       allowNull: false,
     },
     updated_at: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
+      type: Sequelize.DATE,
+      defaultValue: Sequelize.fn("NOW"),
       allowNull: false,
     },
     created_at: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
+      type: Sequelize.DATE,
+      defaultValue: Sequelize.fn("NOW"),
       allowNull: false,
     },
   },
@@ -65,31 +65,37 @@ const User = sequelize.define(
 User.hasOne(Result, {
   foreignKey: "user_id",
 });
-// Result.belongsTo(User, {
-//   foreignKey: "user_id",
-//   targetKey: "id",
-// });
+Result.belongsTo(User, {
+  foreignKey: "user_id",
+  targetKey: "id",
+});
+
+/*  */
 User.hasMany(Token, {
   foreignKey: "user_id",
 });
-// Token.belongsTo(User, {
-//   foreignKey: "user_id",
-//   targetKey: "id",
-// });
+Token.belongsTo(User, {
+  foreignKey: "user_id",
+  targetKey: "id",
+});
+
+/*  */
 User.hasMany(UserQuestion, {
   foreignKey: "user_id",
 });
-// UserQuestion.belongsTo(User, {
-//   foreignKey: "user_id",
-//   targetKey: "id",
-// });
+UserQuestion.belongsTo(User, {
+  foreignKey: "user_id",
+  targetKey: "id",
+});
+
+/*  */
 User.hasMany(UserOption, {
   foreignKey: "user_id",
 });
-// UserOption.belongsTo(User, {
-//   foreignKey: "user_id",
-//   targetKey: "id",
-// });
+UserOption.belongsTo(User, {
+  foreignKey: "user_id",
+  targetKey: "id",
+});
 
 (async function () {
   await sequelize.sync(/*{ alter: true }*/).then(() => {
