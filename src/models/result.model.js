@@ -16,22 +16,27 @@ const Result = sequelize.define(
     },
     correct: {
       type: DataTypes.BIGINT,
+      defaultValue: 0,
       allowNull: false,
     },
     incorrect: {
       type: DataTypes.BIGINT,
+      defaultValue: 0,
       allowNull: false,
     },
     no_answer: {
       type: DataTypes.BIGINT,
+      defaultValue: 0,
       allowNull: false,
     },
     total: {
       type: DataTypes.BIGINT,
+      defaultValue: 0,
       allowNull: false,
     },
     score: {
       type: DataTypes.BIGINT,
+      defaultValue: 0,
       allowNull: false,
     },
     updated_at: {
