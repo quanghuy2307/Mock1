@@ -1,7 +1,8 @@
 const sequelize = require("../configs/db.config");
 const { Sequelize } = require("sequelize");
-const { Result, UserQuestion, UserOption, Token } = require("./index");
+const { Result, UserOption, RefreshToken } = require("./index");
 
+/* Người dùng khi đăng ký sẽ tạo ra bảng này */
 const User = sequelize.define(
   "User",
   {
@@ -12,7 +13,7 @@ const User = sequelize.define(
       allowNull: false,
     },
     full_name: {
-      type: Sequelize.STRING,
+      type: Sequelize.STRING(50),
       allowNull: false,
     },
     birthday: {
@@ -24,7 +25,7 @@ const User = sequelize.define(
       allowNull: false,
     },
     address: {
-      type: Sequelize.STRING,
+      type: Sequelize.STRING(100),
       allowNull: false,
     },
     phone: {
@@ -32,7 +33,7 @@ const User = sequelize.define(
       allowNull: false,
     },
     email: {
-      type: Sequelize.STRING,
+      type: Sequelize.STRING(100),
       unique: true,
       allowNull: false,
     },
@@ -71,19 +72,10 @@ Result.belongsTo(User, {
 });
 
 /*  */
-User.hasMany(Token, {
+User.hasOne(RefreshToken, {
   foreignKey: "user_id",
 });
-Token.belongsTo(User, {
-  foreignKey: "user_id",
-  targetKey: "id",
-});
-
-/*  */
-User.hasMany(UserQuestion, {
-  foreignKey: "user_id",
-});
-UserQuestion.belongsTo(User, {
+RefreshToken.belongsTo(User, {
   foreignKey: "user_id",
   targetKey: "id",
 });

@@ -1,6 +1,7 @@
 const sequelize = require("../configs/db.config");
 const { Sequelize } = require("sequelize");
 
+/* Người dùng khi trả lời sẽ tạo ra bảng này */
 const UserOption = sequelize.define(
   "UserOption",
   {

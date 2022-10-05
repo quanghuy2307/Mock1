@@ -1,15 +1,10 @@
 const sequelize = require("../configs/db.config");
 const { Sequelize } = require("sequelize");
 
+/* Người dùng khi đăng ký sẽ tạo ra bảng này */
 const Result = sequelize.define(
   "Result",
   {
-    id: {
-      type: Sequelize.BIGINT,
-      primaryKey: true,
-      autoIncrement: true,
-      allowNull: false,
-    },
     user_id: {
       type: Sequelize.BIGINT,
       allowNull: false,

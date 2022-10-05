@@ -1,29 +1,25 @@
 const sequelize = require("../configs/db.config");
 const { Sequelize } = require("sequelize");
 
-const UserQuestion = sequelize.define(
-  "UserQuestion",
+/* Người dùng khi đăng ký sẽ tạo ra bảng này */
+const RefreshToken = sequelize.define(
+  "RefreshToken",
   {
-    id: {
-      type: Sequelize.BIGINT,
-      primaryKey: true,
-      autoIncrement: true,
-      allowNull: false,
-    },
     user_id: {
       type: Sequelize.BIGINT,
       allowNull: false,
     },
-    question_id: {
-      type: Sequelize.BIGINT,
+    content: {
+      type: Sequelize.TEXT,
+      defaultValue: "",
       allowNull: false,
     },
-    answer: {
-      type: Sequelize.ENUM("true", "false", "none"), // true/false/none
-      defaultValue: "none",
+    expired_in: {
+      type: Sequelize.STRING,
+      defaultValue: "",
       allowNull: false,
     },
-    updated_at: {
+    created_at: {
       type: Sequelize.DATE,
       defaultValue: Sequelize.fn("NOW"),
       allowNull: false,
@@ -36,11 +32,11 @@ const UserQuestion = sequelize.define(
 
 (async function () {
   await sequelize.sync(/*{ alter: true }*/).then(() => {
-    console.log("Sync UserQuestions Table success!");
+    console.log("Sync RefreshTokens Table success!");
   });
 })().catch((err) => {
-  console.log("Sync UserQuestions Table fail!");
+  console.log("Sync RefreshTokens Table fail!");
   console.log(err);
 });
 
-module.exports = UserQuestion;
+module.exports = RefreshToken;

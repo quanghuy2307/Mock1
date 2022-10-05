@@ -6,96 +6,116 @@ const questionController = {
   createQuestion: async (req, res, next) => {
     const { question, score, options } = req.body;
 
-    const ques = await Question.create({
-      content: question,
-      score: parseInt(score),
-    });
-
-    options.forEach(async (currentValue, index, arr) => {
-      await Option.create({
-        content: currentValue.content,
-        is_true: currentValue.is_true,
-        question_id: parseInt(ques.id),
+    try {
+      const newQuestion = await Question.create({
+        content: question,
+        score: parseInt(score),
       });
-    });
 
-    return res.status(200).json({ message: "Successfully.", data: { id: ques.id } });
+      options.forEach(async (currentValue, index, arr) => {
+        await Option.create({
+          content: currentValue.content,
+          is_true: currentValue.is_true,
+          question_id: parseInt(newQuestion.id),
+        });
+      });
+
+      return res.status(200).json({ message: "Create new question successfully.", data: { id: newQuestion.id } });
+    } catch (err) {
+      return res.status(500).json({ message: "Internal server error.", data: null });
+    }
   },
 
   getAllQuestion: async (req, res, next) => {
-    const allQuestion = await Question.findAll({
-      include: [Option],
-    });
+    try {
+      const allQuestion = await Question.findAll({
+        include: [Option],
+      });
 
-    return res.status(200).json({ message: "Successfully.", data: allQuestion });
+      return res.status(200).json({ message: "Get all question successfully.", data: allQuestion });
+    } catch (err) {
+      return res.status(500).json({ message: "Internal server error.", data: null });
+    }
   },
 
   getQuestionById: async (req, res, next) => {
-    const question = await Question.findOne({
-      attributes: ["content", "score", "updated_at", "created_at"],
-      where: {
-        id: parseInt(req.params.id),
-      },
-    });
+    try {
+      const question = await Question.findOne({
+        attributes: ["content", "score", "updated_at", "created_at"],
+        where: {
+          id: parseInt(req.params.id),
+        },
+      });
 
-    const options = await Option.findAll({
-      attributes: ["content", "is_true"],
-      where: {
-        question_id: parseInt(req.params.id),
-      },
-    });
+      const options = await Option.findAll({
+        attributes: ["content", "is_true"],
+        where: {
+          question_id: parseInt(req.params.id),
+        },
+      });
 
-    return res.status(200).json({ message: "Successfully.", data: { id: req.params.id, question: question.content, score: question.score, options: options, updated_at: question.updated_at, created_at: question.created_at } });
+      return res.status(200).json({ message: "Successfully.", data: { id: req.params.id, question: question.content, score: question.score, options: options, updated_at: question.updated_at, created_at: question.created_at } });
+    } catch (err) {
+      return res.status(500).json({ message: "Internal server error.", data: null });
+    }
   },
 
   updateQuestionById: async (req, res, next) => {
     const { question, score, options } = req.body;
     const questionId = parseInt(req.params.id);
 
-    await Question.update(
-      {
-        content: question,
-        score: parseInt(score),
-      },
-      {
-        where: {
-          id: questionId,
-        },
-      }
-    );
-
-    const optionIds = await Option.findAll({
-      attributes: ["id"],
-      where: {
-        question_id: questionId,
-      },
-    });
-
-    options.forEach(async (currentValue, index, arr) => {
-      await Option.update(
+    try {
+      await Question.update(
         {
-          content: currentValue.content,
-          is_true: currentValue.is_true,
+          content: question,
+          score: parseInt(score),
         },
         {
           where: {
-            [Op.and]: [{ id: parseInt(optionIds[index].id) }, { question_id: questionId }],
+            id: questionId,
           },
         }
       );
-    });
 
-    return res.status(200).json({ message: "Successfully.", data: null });
+      const optionIds = await Option.findAll({
+        attributes: ["id"],
+        where: {
+          question_id: questionId,
+        },
+      });
+
+      options.forEach(async (currentValue, index, arr) => {
+        await Option.update(
+          {
+            content: currentValue.content,
+            is_true: currentValue.is_true,
+          },
+          {
+            where: {
+              [Op.and]: [{ id: parseInt(optionIds[index].id) }, { question_id: questionId }],
+            },
+          }
+        );
+      });
+
+      return res.status(200).json({ message: "Successfully.", data: null });
+    } catch (err) {
+      return res.status(500).json({ message: "Internal server error.", data: null });
+    }
   },
 
   deleteQuestionById: async (req, res, next) => {
-    await Question.destroy({
-      where: {
-        id: parseInt(req.params.id),
-      },
-    });
+    try {
+      await Question.destroy({
+        where: {
+          id: parseInt(req.params.id),
+        },
+      });
 
-    return res.status(200).json({ message: "Successfully.", data: null });
+      return res.status(200).json({ message: "Successfully.", data: null });
+    } catch (err) {
+      return res.status(500).json({ message: "Internal server error.", data: null });
+    }
   },
 };
 
