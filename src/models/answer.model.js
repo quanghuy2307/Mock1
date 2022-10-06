@@ -2,8 +2,8 @@ const sequelize = require("../configs/db.config");
 const { Sequelize } = require("sequelize");
 
 /* Người dùng khi trả lời sẽ tạo ra bảng này */
-const UserOption = sequelize.define(
-  "UserOption",
+const Answer = sequelize.define(
+  "Answer",
   {
     id: {
       type: Sequelize.BIGINT,
@@ -41,11 +41,11 @@ const UserOption = sequelize.define(
 
 (async function () {
   await sequelize.sync(/*{ alter: true }*/).then(() => {
-    console.log("Sync UserOptions Table success!");
+    console.log("Sync Answers Table success!");
   });
 })().catch((err) => {
-  console.log("Sync UserOptions Table fail!");
+  console.log("Sync Answers Table fail!");
   console.log(err);
 });
 
-module.exports = UserOption;
+module.exports = Answer;

@@ -6,21 +6,28 @@ const sequelize = require("./configs/db.config");
 
 const app = express();
 
-/*  */
+/**
+ *
+ */
 app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(express.json());
 
-/*  */
-const { authRouter, userRouter, questionRouter, resultRouter } = require("./routes/index");
+/**
+ *
+ */
+const { authRouter, userRouter, questionRouter, resultRouter, answerRouter } = require("./routes/index");
 
-/*  */
 app.use("/survey/auth", authRouter);
 app.use("/survey/user", userRouter);
 app.use("/survey/result", resultRouter);
 app.use("/survey/question", questionRouter);
+app.use("/survey/answer", answerRouter);
 
+/**
+ *
+ */
 sequelize
   .authenticate()
   .then(() => {

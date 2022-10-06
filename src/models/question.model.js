@@ -1,6 +1,6 @@
 const sequelize = require("../configs/db.config");
 const { Sequelize } = require("sequelize");
-const { Option, UserOption } = require("./index");
+const { Option, Answer } = require("./index");
 
 const Question = sequelize.define(
   "Question",
@@ -46,10 +46,10 @@ Option.belongsTo(Question, {
 });
 
 /*  */
-Question.hasMany(UserOption, {
+Question.hasMany(Answer, {
   foreignKey: "question_id",
 });
-UserOption.belongsTo(Question, {
+Answer.belongsTo(Question, {
   foreignKey: "question_id",
   targetKey: "id",
 });

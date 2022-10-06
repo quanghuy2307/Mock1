@@ -19,11 +19,6 @@ const Result = sequelize.define(
       defaultValue: 0,
       allowNull: false,
     },
-    no_answer: {
-      type: Sequelize.BIGINT,
-      defaultValue: 0,
-      allowNull: false,
-    },
     total: {
       type: Sequelize.BIGINT,
       defaultValue: 0,

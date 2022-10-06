@@ -1,6 +1,6 @@
 const sequelize = require("../configs/db.config");
 const { Sequelize } = require("sequelize");
-const { Result, UserOption, RefreshToken } = require("./index");
+const { Result, Answer, RefreshToken } = require("./index");
 
 /* Người dùng khi đăng ký sẽ tạo ra bảng này */
 const User = sequelize.define(
@@ -81,10 +81,10 @@ RefreshToken.belongsTo(User, {
 });
 
 /*  */
-User.hasMany(UserOption, {
+User.hasMany(Answer, {
   foreignKey: "user_id",
 });
-UserOption.belongsTo(User, {
+Answer.belongsTo(User, {
   foreignKey: "user_id",
   targetKey: "id",
 });
