@@ -1,24 +1,15 @@
 const resultRouter = require("express").Router();
 const { resultController } = require("../controllers/index");
-
-/**
- * Lấy kết quả của tất cả người chơi (admin)
- */
-resultRouter.get("/", resultController.getAllResult);
+const { authMiddleware } = require("../middlewares/index");
 
 /**
  * Lấy kết quả của người chơi có id (admin/user)
  */
-resultRouter.get("/:id", resultController.getResultById);
-
-/**
- * Cập nhật kết quả của tất cả người chơi (admin)
- */
-resultRouter.put("/", resultController.updateAllResult);
+resultRouter.get("/:id", authMiddleware.verifyAccessTokenAndAdminOrBySelf, resultController.getResultById);
 
 /**
  * Cập nhật kết quả của người chơi có id (admin/user)
  */
-resultRouter.put("/:id", resultController.updateResultById);
+resultRouter.put("/:id", authMiddleware.verifyAccessTokenAndAdminOrBySelf, resultController.updateResultById);
 
 module.exports = resultRouter;

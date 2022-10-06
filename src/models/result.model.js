@@ -24,11 +24,6 @@ const Result = sequelize.define(
       defaultValue: 0,
       allowNull: false,
     },
-    score: {
-      type: Sequelize.BIGINT,
-      defaultValue: 0,
-      allowNull: false,
-    },
     updated_at: {
       type: Sequelize.DATE,
       defaultValue: Sequelize.fn("NOW"),

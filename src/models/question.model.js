@@ -16,10 +16,6 @@ const Question = sequelize.define(
       allowNull: false,
       unique: true,
     },
-    score: {
-      type: Sequelize.BIGINT,
-      allowNull: false,
-    },
     updated_at: {
       type: Sequelize.DATE,
       defaultValue: Sequelize.fn("NOW"),
