@@ -118,6 +118,45 @@ const authController = {
       return res.status(500).json({ message: "Internal server error.", data: null });
     }
   },
+
+  getAccessToken: async (req, res, next) => {
+    try {
+      const accessToken = generateToken(account, process.env.ACCESS_TOKEN_SECRET, process.env.ACCESS_TOKEN_EXPIRED);
+
+      return res.status(200).json({ message: "Logged out successfully.", data: { access_token: accessToken } });
+    } catch (err) {
+      return res.status(500).json({ message: "Internal server error.", data: null });
+    }
+  },
+
+  getRefreshToken: async (req, res, next) => {
+    try {
+      const refreshToken = generateToken(account, process.env.REFRESH_TOKEN_SECRET, process.env.REFRESH_TOKEN_EXPIRED);
+
+      await RefreshToken.update(
+        {
+          content: refreshToken,
+          expired_in: process.env.REFRESH_TOKEN_EXPIRED,
+        },
+        {
+          where: {
+            id: parseInt(account.id),
+          },
+        }
+      );
+
+      res.cookie("refresh_token", refreshToken, {
+        httpOnly: true,
+        secure: false,
+        path: "/",
+        sameSite: "strict",
+      });
+
+      return res.status(200).json({ message: "Logged out successfully.", data: null });
+    } catch (err) {
+      return res.status(500).json({ message: "Internal server error.", data: null });
+    }
+  },
 };
 
 module.exports = authController;
