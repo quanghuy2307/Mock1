@@ -6,34 +6,36 @@ const jwt = require("jsonwebtoken");
 const authMiddleware = {
   verifyAccessToken: async (req, res, next) => {
     try {
-      jwt.verify(req.headers.access_token, process.env.ACCESS_TOKEN_SECRET, (err, token) => {
+      jwt.verify(req.headers.access_token, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
         if (err) {
           return res.status(401).json({ message: "Incorrect access token.", data: null });
         }
 
+        req.user = payload;
+
         next();
       });
     } catch (err) {
-      console.log(err);
       return res.status(500).json({ message: "Internal server error.", data: null });
     }
   },
 
   verifyAccessTokenAndAdmin: async (req, res, next) => {
     try {
-      jwt.verify(req.headers.access_token, process.env.ACCESS_TOKEN_SECRET, (err, token) => {
+      jwt.verify(req.headers.access_token, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
         if (err) {
           return res.status(401).json({ message: "Incorrect access token.", data: null });
         }
 
-        if (token.role === "admin") {
+        if (payload.role === "admin") {
+          req.user = payload;
+
           next();
         } else {
           return res.status(401).json({ message: "You're not admin.", data: null });
         }
       });
     } catch (err) {
-      console.log(err);
       return res.status(500).json({ message: "Internal server error.", data: null });
     }
   },

@@ -5,7 +5,7 @@ const { authMiddleware } = require("../middlewares/index");
 /**
  * Gửi tất cả câu trả lời lên (admin/user)
  */
-answerRouter.post("/", answerController.createAnswer);
+answerRouter.post("/", authMiddleware.verifyAccessToken, answerController.createAnswer);
 
 /**
  * Xem lại tất cả câu trả lời sau khi nộp (admin/user)
