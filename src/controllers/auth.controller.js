@@ -121,7 +121,7 @@ const authController = {
 
   getAccessToken: async (req, res, next) => {
     try {
-      const accessToken = generateToken(account, process.env.ACCESS_TOKEN_SECRET, process.env.ACCESS_TOKEN_EXPIRED);
+      const accessToken = generateToken(req.user, process.env.ACCESS_TOKEN_SECRET, process.env.ACCESS_TOKEN_EXPIRED);
 
       return res.status(200).json({ message: "Logged out successfully.", data: { access_token: accessToken } });
     } catch (err) {
@@ -131,7 +131,7 @@ const authController = {
 
   getRefreshToken: async (req, res, next) => {
     try {
-      const refreshToken = generateToken(account, process.env.REFRESH_TOKEN_SECRET, process.env.REFRESH_TOKEN_EXPIRED);
+      const refreshToken = generateToken(req.user, process.env.REFRESH_TOKEN_SECRET, process.env.REFRESH_TOKEN_EXPIRED);
 
       await RefreshToken.update(
         {
@@ -140,7 +140,7 @@ const authController = {
         },
         {
           where: {
-            id: parseInt(account.id),
+            id: parseInt(req.user.id),
           },
         }
       );

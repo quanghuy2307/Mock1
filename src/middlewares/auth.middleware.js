@@ -68,10 +68,12 @@ const authMiddleware = {
         return reject(res.status(401).json({ message: "Invalid refresh token.", data: null }));
       }
 
-      jwt.verify(req.headers.refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, token) => {
+      jwt.verify(req.headers.refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, payload) => {
         if (err) {
           return reject(res.status(401).json({ message: "Incorrect refresh token.", data: null }));
         }
+
+        req.user = payload;
 
         next();
       });
