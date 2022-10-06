@@ -6,10 +6,10 @@ const userController = {
   getAllUser: async (req, res, next) => {
     try {
       const allUser = await User.findAll({
-        attributes: ["id", "full_name", "birthday", "sex", "address", "phone", "email", "role", "updated_at", "created_at"],
+        attributes: ["id", "full_name", "birthday", "sex", "address", "phone", "email", "role"],
       });
 
-      return res.status(200).json({ message: "Successfully.", data: allUser });
+      return res.status(200).json({ message: "Get all user successfully.", data: allUser });
     } catch (err) {
       return res.status(500).json({ message: "Internal server error.", data: null });
     }
@@ -18,22 +18,22 @@ const userController = {
   getUserById: async (req, res, next) => {
     try {
       const user = await User.findOne({
-        attributes: ["id", "full_name", "birthday", "sex", "address", "phone", "email", "role", "updated_at", "created_at"],
+        attributes: ["id", "full_name", "birthday", "sex", "address", "phone", "email", "role"],
         where: {
           id: parseInt(req.params.id),
         },
       });
 
-      return res.status(200).json({ message: "Successfully.", data: user });
+      return res.status(200).json({ message: "Get user successfully.", data: user });
     } catch (err) {
       return res.status(500).json({ message: "Internal server error.", data: null });
     }
   },
 
   updateUserById: async (req, res, next) => {
-    const { full_name, birthday, sex, address, phone, email, password, role } = req.body;
-
     try {
+      const { full_name, birthday, sex, address, phone, email, password, role } = req.body;
+
       await User.update(
         {
           full_name: full_name,
@@ -52,7 +52,7 @@ const userController = {
         }
       );
 
-      return res.status(200).json({ message: "Successfully.", data: null });
+      return res.status(200).json({ message: "Update user successfully.", data: null });
     } catch (err) {
       return res.status(500).json({ message: "Internal server error.", data: null });
     }
@@ -66,7 +66,7 @@ const userController = {
         },
       });
 
-      return res.status(200).json({ message: "Successfully.", data: null });
+      return res.status(200).json({ message: "Delete user successfully.", data: null });
     } catch (err) {
       return res.status(500).json({ message: "Internal server error.", data: null });
     }

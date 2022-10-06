@@ -10,7 +10,27 @@ const resultController = {
 
   getResultById: async (req, res, next) => {
     try {
-    } catch (err) {}
+      const val = await Option.findAll({
+        attributes: ["question_id", "is_true"],
+        include: [
+          // {
+          //   model: Question,
+          // },
+          {
+            model: Answer,
+            attributes: ["is_choice"],
+            where: {
+              user_id: parseInt(req.params.id),
+            },
+          },
+        ],
+      });
+
+      return res.status(200).json(val);
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({ message: "Internal server error.", data: null });
+    }
   },
 
   updateAllResult: async (req, res, next) => {
@@ -20,7 +40,24 @@ const resultController = {
 
   updateResultById: async (req, res, next) => {
     try {
-    } catch (err) {}
+      const val = await Answer.findAll({
+        include: [
+          // {
+          //   model: Question,
+          // },
+          {
+            model: Option,
+          },
+        ],
+        where: {
+          user_id: parseInt(req.params.id),
+        },
+      });
+
+      return res.status(200).json(val);
+    } catch (err) {
+      return res.status(500).json({ message: "Internal server error.", data: null });
+    }
   },
 };
 
