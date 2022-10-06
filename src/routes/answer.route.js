@@ -10,16 +10,16 @@ answerRouter.post("/", authMiddleware.verifyAccessToken, answerController.create
 /**
  * Xem lại tất cả câu trả lời sau khi nộp (admin/user)
  */
-answerRouter.get("/", answerController.getAnswer);
+answerRouter.get("/:id", authMiddleware.verifyAccessTokenAndAdminOrBySelf, answerController.getAnswer);
 
 /**
  * Thay đổi câu trả lời sau khi nộp (admin/user)
  */
-answerRouter.put("/", answerController.updateAnswer);
+answerRouter.put("/:id", authMiddleware.verifyAccessTokenAndAdminOrBySelf, answerController.updateAnswer);
 
 /**
  * Xóa tất cả câu trả lời sau khi nộp (admin)
  */
-answerRouter.delete("/", answerController.deleteAnswer);
+answerRouter.delete("/:id", authMiddleware.verifyAccessTokenAndAdmin, answerController.deleteAnswer);
 
 module.exports = answerRouter;

@@ -28,11 +28,27 @@ const authMiddleware = {
         }
 
         if (payload.role === "admin") {
-          req.user = payload;
-
           next();
         } else {
           return res.status(401).json({ message: "You're not admin.", data: null });
+        }
+      });
+    } catch (err) {
+      return res.status(500).json({ message: "Internal server error.", data: null });
+    }
+  },
+
+  verifyAccessTokenAndAdminOrBySelf: async (req, res, next) => {
+    try {
+      jwt.verify(req.headers.access_token, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
+        if (err) {
+          return res.status(401).json({ message: "Incorrect access token.", data: null });
+        }
+
+        if (payload.role == "admin" || payload.id == req.params.id) {
+          next();
+        } else {
+          return res.status(401).json({ message: "Permission denied.", data: null });
         }
       });
     } catch (err) {
