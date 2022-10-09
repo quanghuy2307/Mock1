@@ -17,13 +17,14 @@ app.use(express.json());
 /**
  *
  */
-const { authRouter, userRouter, questionRouter, resultRouter, answerRouter } = require("./routes/index");
+const { authRouter, userRouter, questionRouter, resultRouter, answerRouter, homeRouter } = require("./routes/index");
 
 app.use("/survey/auth", authRouter);
 app.use("/survey/user", userRouter);
 app.use("/survey/result", resultRouter);
 app.use("/survey/question", questionRouter);
 app.use("/survey/answer", answerRouter);
+app.use("/survey/", homeRouter);
 
 /**
  *
