@@ -30,13 +30,16 @@ const RefreshToken = sequelize.define(
   }
 );
 
-(async function () {
-  await sequelize.sync(/*{ alter: true }*/).then(() => {
-    console.log("Sync RefreshTokens Table success!");
-  });
-})().catch((err) => {
-  console.log("Sync RefreshTokens Table fail!");
-  console.log(err);
-});
+// (async () => {
+//   await sequelize
+//     .sync({})
+//     .then(() => {
+//       console.log("Sync RefreshTokens Table success!");
+//     })
+//     .catch((err) => {
+//       console.log("Sync RefreshTokens Table fail!");
+//       console.log(err);
+//     });
+// })();
 
 module.exports = RefreshToken;

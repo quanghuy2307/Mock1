@@ -1,21 +1,24 @@
-const httpStatus = require("http-status");
 const { User } = require("../models/index");
 const bcrypt = require("bcrypt");
 
 const userController = {
-  getAllUser: async (req, res, next) => {
+  getAllUser: async (req, res) => {
     try {
-      const allUser = await User.findAll({
+      const users = await User.findAll({
         attributes: ["id", "full_name", "birthday", "sex", "address", "phone", "email", "role"],
       });
 
-      return res.status(200).json({ message: "Get all user successfully.", data: allUser });
+      if (!users.length) {
+        return res.status(404).json({ message: "User not found.", data: null });
+      } else {
+        return res.status(200).json({ message: "Get all question successfully.", data: users });
+      }
     } catch (err) {
       return res.status(500).json({ message: "Internal server error.", data: null });
     }
   },
 
-  getUserById: async (req, res, next) => {
+  getUserById: async (req, res) => {
     try {
       const user = await User.findOne({
         attributes: ["id", "full_name", "birthday", "sex", "address", "phone", "email", "role"],
@@ -24,49 +27,73 @@ const userController = {
         },
       });
 
-      return res.status(200).json({ message: "Get user successfully.", data: user });
+      if (!user) {
+        return res.status(404).json({ message: "User not found.", data: null });
+      } else {
+        return res.status(200).json({ message: "Get user successfully.", data: user });
+      }
     } catch (err) {
       return res.status(500).json({ message: "Internal server error.", data: null });
     }
   },
 
-  updateUserById: async (req, res, next) => {
+  updateUserById: async (req, res) => {
     try {
-      const { full_name, birthday, sex, address, phone, email, password, role } = req.body;
-
-      await User.update(
-        {
-          full_name: full_name,
-          birthday: birthday,
-          sex: sex,
-          address: address,
-          phone: phone,
-          email: email,
-          hashed_password: bcrypt.hashSync(password, 10),
-          role: role,
-        },
-        {
-          where: {
-            id: parseInt(req.params.id),
-          },
-        }
-      );
-
-      return res.status(200).json({ message: "Update user successfully.", data: null });
-    } catch (err) {
-      return res.status(500).json({ message: "Internal server error.", data: null });
-    }
-  },
-
-  deleteUserById: async (req, res, next) => {
-    try {
-      await User.destroy({
+      const user = await User.findOne({
+        attributes: ["id"],
         where: {
           id: parseInt(req.params.id),
         },
       });
 
-      return res.status(200).json({ message: "Delete user successfully.", data: null });
+      if (!user) {
+        return res.status(404).json({ message: "User not found.", data: null });
+      } else {
+        await User.update(
+          {
+            full_name: req.body.full_name,
+            birthday: req.body.birthday,
+            sex: req.body.sex,
+            address: req.body.address,
+            phone: req.body.phone,
+            email: req.body.email,
+            hashed_password: bcrypt.hashSync(req.body.password, 10),
+            role: req.body.role,
+          },
+          {
+            where: {
+              id: parseInt(req.params.id),
+            },
+          }
+        );
+
+        return res.status(200).json({ message: "Update user successfully.", data: null });
+      }
+    } catch (err) {
+      return res.status(500).json({ message: "Internal server error.", data: null });
+    }
+  },
+
+  deleteUserById: async (req, res) => {
+    try {
+      const user = await User.findOne({
+        attributes: ["id"],
+        where: {
+          id: parseInt(req.params.id),
+        },
+      });
+
+      if (!user) {
+        return res.status(404).json({ message: "User not found.", data: null });
+      } else {
+        await User.destroy({
+          where: {
+            id: parseInt(req.params.id),
+          },
+        });
+
+        return res.status(200).json({ message: "Delete user successfully.", data: null });
+      }
     } catch (err) {
       return res.status(500).json({ message: "Internal server error.", data: null });
     }

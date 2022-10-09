@@ -1,5 +1,4 @@
 const dotenv = require("../configs/env.config");
-const httpStatus = require("http-status");
 const { RefreshToken } = require("../models/index");
 const jwt = require("jsonwebtoken");
 

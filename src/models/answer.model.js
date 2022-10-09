@@ -13,13 +13,9 @@ const Answer = sequelize.define(
       type: Sequelize.BIGINT,
       allowNull: false,
     },
-    option_id: {
-      type: Sequelize.BIGINT,
-      allowNull: false,
-    },
-    is_choice: {
-      type: Sequelize.BOOLEAN, // yes/no
-      defaultValue: "no",
+    choices: {
+      type: Sequelize.ARRAY(Sequelize.BIGINT),
+      defaultValue: [],
       allowNull: false,
     },
     updated_at: {
@@ -33,13 +29,16 @@ const Answer = sequelize.define(
   }
 );
 
-(async function () {
-  await sequelize.sync(/*{ alter: true }*/).then(() => {
-    console.log("Sync Answers Table success!");
-  });
-})().catch((err) => {
-  console.log("Sync Answers Table fail!");
-  console.log(err);
-});
+// (async () => {
+//   await sequelize
+//     .sync({})
+//     .then(() => {
+//       console.log("Sync Answers Table success!");
+//     })
+//     .catch((err) => {
+//       console.log("Sync Answers Table fail!");
+//       console.log(err);
+//     });
+// })();
 
 module.exports = Answer;

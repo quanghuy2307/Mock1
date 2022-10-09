@@ -1,75 +1,117 @@
-const httpStatus = require("http-status");
-const { Option, Answer, Result } = require("../models/index");
+const { Answer, Result, Question } = require("../models/index");
+const _ = require("lodash");
 
 const resultController = {
-  getResultById: async (req, res, next) => {
+  getAllResult: async (req, res) => {
     try {
-      const result = await Result.findOne({
-        attributes: ["correct", "incorrect", "total"],
+      const results = await Result.findAll({
+        attributes: ["user_id", "corrects", "incorrects"],
+      });
+
+      if (!results.length) {
+        return res.status(404).json({ message: "Result not found.", data: null });
+      } else {
+        return res.status(200).json({ message: "Get result successfully.", data: results });
+      }
+    } catch (err) {
+      return res.status(500).json({ message: "Internal server error.", data: null });
+    }
+  },
+
+  getResultById: async (req, res) => {
+    try {
+      const results = await Result.findOne({
+        attributes: ["corrects", "incorrects"],
         where: {
           user_id: parseInt(req.params.id),
         },
       });
 
-      return res.status(200).json({ message: "Get result successfully.", data: result });
+      if (!results) {
+        return res.status(404).json({ message: "Result not found.", data: null });
+      } else {
+        return res.status(200).json({ message: "Get result successfully.", data: results });
+      }
     } catch (err) {
-      console.log(err);
       return res.status(500).json({ message: "Internal server error.", data: null });
     }
   },
 
-  updateResultById: async (req, res, next) => {
+  updateResultById: async (req, res) => {
     try {
-      const val = await Option.findAll({
-        attributes: ["question_id", "is_true"],
-        order: [["question_id", "ASC"]],
+      const results = await Answer.findAll({
+        attributes: ["question_id", "choices"],
         include: [
           {
-            model: Answer,
-            attributes: ["is_choice"],
+            model: Question,
+            attributes: ["answers"],
+          },
+        ],
+        where: {
+          user_id: parseInt(req.params.id),
+        },
+      });
+
+      if (!results.length) {
+        return res.status(404).json({ message: "Result not found.", data: null });
+      } else {
+        const corrects = [];
+        const incorrects = [];
+
+        results.forEach((result) => {
+          if (_.isEqual(result.choices.sort(), result.Question.answers.sort())) {
+            corrects.push(parseInt(result.question_id));
+          } else {
+            incorrects.push(parseInt(result.question_id));
+          }
+        });
+
+        await Result.update(
+          {
+            corrects: corrects,
+            incorrects: incorrects,
+          },
+          {
             where: {
               user_id: parseInt(req.params.id),
             },
-          },
-        ],
-      });
-
-      let questionID = 0;
-      let total = 0;
-      let incorrect = 0;
-      let isChecked = false;
-
-      val.forEach((currentValue, index, arr) => {
-        if (questionID != currentValue.question_id) {
-          questionID = currentValue.question_id;
-          isChecked = false;
-          total++;
-        }
-
-        if (!isChecked) {
-          if (currentValue.is_true != currentValue.Answers[0].is_choice) {
-            incorrect++;
-            isChecked = true;
           }
-        }
+        );
+
+        return res.status(200).json({ message: "Update result successfully.", data: null });
+      }
+    } catch (err) {
+      return res.status(500).json({ message: "Internal server error.", data: null });
+    }
+  },
+
+  deleteResultById: async (req, res) => {
+    try {
+      const results = await Result.findOne({
+        attributes: ["user_id"],
+        where: {
+          user_id: parseInt(req.params.id),
+        },
       });
 
-      await Result.update(
-        {
-          correct: total - incorrect,
-          incorrect: incorrect,
-          total: total,
-        },
-        {
-          where: {
-            user_id: parseInt(req.params.id),
+      if (!results) {
+        return res.status(404).json({ message: "Result not found.", data: null });
+      } else {
+        await Result.update(
+          {
+            corrects: [],
+            incorrects: [],
           },
-        }
-      );
+          {
+            where: {
+              user_id: parseInt(req.params.id),
+            },
+          }
+        );
 
-      return res.status(200).json({ message: "Update result successfully.", data: null });
+        return res.status(200).json({ message: "Delete result successfully.", data: null });
+      }
     } catch (err) {
-      console.log(err);
       return res.status(500).json({ message: "Internal server error.", data: null });
     }
   },

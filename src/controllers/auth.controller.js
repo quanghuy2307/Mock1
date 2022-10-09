@@ -1,9 +1,9 @@
 const dotenv = require("../configs/env.config");
-const httpStatus = require("http-status");
 const { User, RefreshToken, Result } = require("../models/index");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
+/* Hàm này chuyển sang phần utils sau */
 const generateToken = (user, secret, expiresIn) => {
   return jwt.sign(
     {
@@ -23,29 +23,30 @@ const authController = {
           email: req.body.email,
         },
       });
+
       if (isEmailExist) {
-        return res.status(500).json({ message: "Email already exists.", data: null });
+        return res.status(400).json({ message: "Email already exists.", data: null });
+      } else {
+        const newAccount = await User.create({
+          full_name: req.body.full_name,
+          birthday: req.body.birthday,
+          sex: req.body.sex,
+          address: req.body.address,
+          phone: req.body.phone,
+          email: req.body.email,
+          hashed_password: bcrypt.hashSync(req.body.password, 10),
+        });
+
+        await RefreshToken.create({
+          user_id: parseInt(newAccount.id),
+        });
+
+        await Result.create({
+          user_id: parseInt(newAccount.id),
+        });
+
+        return res.status(200).json({ message: "Create account successfully.", data: { id: newAccount.id } });
       }
-
-      const newAccount = await User.create({
-        full_name: req.body.full_name,
-        birthday: req.body.birthday,
-        sex: req.body.sex,
-        address: req.body.address,
-        phone: req.body.phone,
-        email: req.body.email,
-        hashed_password: bcrypt.hashSync(req.body.password, 10),
-      });
-
-      await RefreshToken.create({
-        user_id: parseInt(newAccount.id),
-      });
-
-      await Result.create({
-        user_id: parseInt(newAccount.id),
-      });
-
-      return res.status(200).json({ message: "Create account successfully.", data: { id: newAccount.id } });
     } catch (err) {
       return res.status(500).json({ message: "Internal server error.", data: {} });
     }
@@ -58,11 +59,13 @@ const authController = {
           email: req.body.email,
         },
       });
+
       if (!account) {
         return res.status(401).json({ message: "Email does not exist.", data: null });
       }
 
       const isPasswordCorrect = bcrypt.compareSync(req.body.password, account.hashed_password);
+
       if (!isPasswordCorrect) {
         return res.status(401).json({ message: "Incorrect password.", data: null });
       }

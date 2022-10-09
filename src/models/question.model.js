@@ -1,6 +1,6 @@
 const sequelize = require("../configs/db.config");
 const { Sequelize } = require("sequelize");
-const { Option, Answer } = require("./index");
+const { Answer } = require("./index");
 
 const Question = sequelize.define(
   "Question",
@@ -11,10 +11,20 @@ const Question = sequelize.define(
       autoIncrement: true,
       allowNull: false,
     },
-    content: {
+    question: {
       type: Sequelize.TEXT,
       allowNull: false,
       unique: true,
+    },
+    options: {
+      type: Sequelize.ARRAY(Sequelize.TEXT),
+      defaultValue: [],
+      allowNull: false,
+    },
+    answers: {
+      type: Sequelize.ARRAY(Sequelize.BIGINT),
+      defaultValue: [],
+      allowNull: false,
     },
     updated_at: {
       type: Sequelize.DATE,
@@ -33,16 +43,7 @@ const Question = sequelize.define(
 );
 
 /*  */
-Question.hasMany(Option, {
-  foreignKey: "question_id",
-});
-Option.belongsTo(Question, {
-  foreignKey: "question_id",
-  targetKey: "id",
-});
-
-/*  */
-Question.hasMany(Answer, {
+Question.hasOne(Answer, {
   foreignKey: "question_id",
 });
 Answer.belongsTo(Question, {
@@ -50,13 +51,16 @@ Answer.belongsTo(Question, {
   targetKey: "id",
 });
 
-(async function () {
-  await sequelize.sync(/*{ alter: true }*/).then(() => {
-    console.log("Sync Questions Table success!");
-  });
-})().catch((err) => {
-  console.log("Sync Questions Table fail!");
-  console.log(err);
-});
+// (async () => {
+//   await sequelize
+//     .sync({})
+//     .then(() => {
+//       console.log("Sync Questions Table success!");
+//     })
+//     .catch((err) => {
+//       console.log("Sync Questions Table fail!");
+//       console.log(err);
+//     });
+// })();
 
 module.exports = Question;

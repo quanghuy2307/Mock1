@@ -9,19 +9,14 @@ const Result = sequelize.define(
       type: Sequelize.BIGINT,
       allowNull: false,
     },
-    correct: {
-      type: Sequelize.BIGINT,
-      defaultValue: 0,
+    corrects: {
+      type: Sequelize.ARRAY(Sequelize.BIGINT),
+      defaultValue: [],
       allowNull: false,
     },
-    incorrect: {
-      type: Sequelize.BIGINT,
-      defaultValue: 0,
-      allowNull: false,
-    },
-    total: {
-      type: Sequelize.BIGINT,
-      defaultValue: 0,
+    incorrects: {
+      type: Sequelize.ARRAY(Sequelize.BIGINT),
+      defaultValue: [],
       allowNull: false,
     },
     updated_at: {
@@ -35,13 +30,16 @@ const Result = sequelize.define(
   }
 );
 
-(async function () {
-  await sequelize.sync(/*{ alter: true }*/).then(() => {
-    console.log("Sync Results Table success!");
-  });
-})().catch((err) => {
-  console.log("Sync Results Table fail!");
-  console.log(err);
-});
+// (async () => {
+//   await sequelize
+//     .sync({})
+//     .then(() => {
+//       console.log("Sync Results Table success!");
+//     })
+//     .catch((err) => {
+//       console.log("Sync Results Table fail!");
+//       console.log(err);
+//     });
+// })();
 
 module.exports = Result;

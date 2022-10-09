@@ -1,114 +1,118 @@
-const httpStatus = require("http-status");
-const { Question, Option } = require("../models/index");
-const { Op } = require("sequelize");
+const { Question } = require("../models/index");
 
 const questionController = {
-  createQuestion: async (req, res, next) => {
+  createQuestion: async (req, res) => {
     try {
-      const { question, options } = req.body;
-
-      const newQuestion = await Question.create({
-        content: question,
+      const isQuestionValid = await Question.findOne({
+        attributes: ["id"],
+        where: {
+          question: req.body.question,
+        },
       });
 
-      options.forEach(async (currentValue, index, arr) => {
-        currentValue.question_id = parseInt(newQuestion.id);
-      });
+      if (isQuestionValid) {
+        return res.status(404).json({ message: "Question is valid.", data: null });
+      } else {
+        const newQuestion = await Question.create({
+          question: req.body.question,
+          options: req.body.options,
+          answers: req.body.answers,
+        });
 
-      await Option.bulkCreate(options);
-
-      return res.status(200).json({ message: "Create new question successfully.", data: { id: newQuestion.id } });
+        return res.status(200).json({ message: "Create question successfully.", data: { id: newQuestion.id } });
+      }
     } catch (err) {
       return res.status(500).json({ message: "Internal server error.", data: null });
     }
   },
 
-  getAllQuestion: async (req, res, next) => {
+  getAllQuestion: async (req, res) => {
     try {
-      const allQuestion = await Question.findAll({
-        include: [Option],
+      const questions = await Question.findAll({
+        attributes: ["id", "question", "options"],
       });
 
-      return res.status(200).json({ message: "Get all question successfully.", data: allQuestion });
+      if (!questions) {
+        return res.status(404).json({ message: "Question not found.", data: null });
+      } else {
+        return res.status(200).json({ message: "Get all question successfully.", data: questions });
+      }
     } catch (err) {
       return res.status(500).json({ message: "Internal server error.", data: null });
     }
   },
 
-  getQuestionById: async (req, res, next) => {
+  getQuestionById: async (req, res) => {
     try {
       const question = await Question.findOne({
-        attributes: ["content"],
+        attributes: ["id", "question", "options"],
         where: {
           id: parseInt(req.params.id),
         },
       });
 
-      const options = await Option.findAll({
-        attributes: ["content", "is_true"],
-        where: {
-          question_id: parseInt(req.params.id),
-        },
-      });
-
-      return res.status(200).json({ message: "Get question successfully.", data: { id: req.params.id, question: question.content, options: options, updated_at: question.updated_at, created_at: question.created_at } });
+      if (!question) {
+        return res.status(404).json({ message: "Question not found.", data: null });
+      } else {
+        return res.status(200).json({ message: "Get question successfully.", data: question });
+      }
     } catch (err) {
       return res.status(500).json({ message: "Internal server error.", data: null });
     }
   },
 
-  updateQuestionById: async (req, res, next) => {
+  updateQuestionById: async (req, res) => {
     try {
-      const { question, options } = req.body;
-      const questionId = parseInt(req.params.id);
-
-      await Question.update(
-        {
-          content: question,
-        },
-        {
-          where: {
-            id: questionId,
-          },
-        }
-      );
-
-      const optionIds = await Option.findAll({
+      const question = await Question.findOne({
         attributes: ["id"],
         where: {
-          question_id: questionId,
+          id: parseInt(req.params.id),
         },
       });
 
-      options.forEach(async (currentValue, index, arr) => {
-        await Option.update(
+      if (!question) {
+        return res.status(404).json({ message: "Question not found.", data: null });
+      } else {
+        await Question.update(
           {
-            content: currentValue.content,
-            is_true: currentValue.is_true,
+            question: req.body.question,
+            options: req.body.options,
+            answers: req.body.answers,
           },
           {
             where: {
-              [Op.and]: [{ id: parseInt(optionIds[index].id) }, { question_id: questionId }],
+              id: parseInt(req.params.id),
             },
           }
         );
-      });
 
-      return res.status(200).json({ message: "Update question successfully.", data: null });
+        return res.status(200).json({ message: "Update question successfully.", data: null });
+      }
     } catch (err) {
       return res.status(500).json({ message: "Internal server error.", data: null });
     }
   },
 
-  deleteQuestionById: async (req, res, next) => {
+  deleteQuestionById: async (req, res) => {
     try {
-      await Question.destroy({
+      const question = await Question.findOne({
+        attributes: ["id"],
         where: {
           id: parseInt(req.params.id),
         },
       });
 
-      return res.status(200).json({ message: "Delete question successfully.", data: null });
+      if (!question) {
+        return res.status(404).json({ message: "Question not found.", data: null });
+      } else {
+        await Question.destroy({
+          where: {
+            id: parseInt(req.params.id),
+          },
+        });
+
+        return res.status(200).json({ message: "Delete question successfully.", data: null });
+      }
     } catch (err) {
       return res.status(500).json({ message: "Internal server error.", data: null });
     }

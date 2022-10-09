@@ -37,3 +37,15 @@ sequelize
     });
   })
   .catch(() => logger.error(`Connect DB fail ${process.env.PORT}.`));
+
+sequelize
+  .sync({
+    /* alter: true */
+  })
+  .then(() => {
+    console.log("Sync Tables success!");
+  })
+  .catch((err) => {
+    console.log("Sync Tables fail!");
+    console.log(err);
+  });

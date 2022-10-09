@@ -21,11 +21,12 @@ const User = sequelize.define(
       allowNull: false,
     },
     sex: {
-      type: Sequelize.STRING(6), // Male/Female/Others
+      type: Sequelize.ENUM("male", "female", "others"),
+      defaultValue: "others",
       allowNull: false,
     },
     address: {
-      type: Sequelize.STRING(100),
+      type: Sequelize.STRING(50),
       allowNull: false,
     },
     phone: {
@@ -33,7 +34,7 @@ const User = sequelize.define(
       allowNull: false,
     },
     email: {
-      type: Sequelize.STRING(100),
+      type: Sequelize.STRING(50),
       unique: true,
       allowNull: false,
     },
@@ -42,7 +43,7 @@ const User = sequelize.define(
       allowNull: false,
     },
     role: {
-      type: Sequelize.ENUM("user", "admin"), // user/admin
+      type: Sequelize.ENUM("user", "admin"),
       defaultValue: "user",
       allowNull: false,
     },
@@ -63,19 +64,19 @@ const User = sequelize.define(
 );
 
 /*  */
-User.hasOne(Result, {
+User.hasOne(RefreshToken, {
   foreignKey: "user_id",
 });
-Result.belongsTo(User, {
+RefreshToken.belongsTo(User, {
   foreignKey: "user_id",
   targetKey: "id",
 });
 
 /*  */
-User.hasOne(RefreshToken, {
+User.hasOne(Result, {
   foreignKey: "user_id",
 });
-RefreshToken.belongsTo(User, {
+Result.belongsTo(User, {
   foreignKey: "user_id",
   targetKey: "id",
 });
@@ -89,13 +90,16 @@ Answer.belongsTo(User, {
   targetKey: "id",
 });
 
-(async function () {
-  await sequelize.sync(/*{ alter: true }*/).then(() => {
-    console.log("Sync Users Table success!");
-  });
-})().catch((err) => {
-  console.log("Sync Users Table fail!");
-  console.log(err);
-});
+// (async () => {
+//   await sequelize
+//     .sync({})
+//     .then(() => {
+//       console.log("Sync Users Table success!");
+//     })
+//     .catch((err) => {
+//       console.log("Sync Users Table fail!");
+//       console.log(err);
+//     });
+// })();
 
 module.exports = User;
