@@ -89,20 +89,20 @@ const authController = {
       }
 
       if (account && isPasswordCorrect) {
-        res.cookie("access_token", await generateAndStoreToken("access_token", account, process.env.ACCESS_TOKEN_SECRET, 60 * 1000), {
+        res.cookie("access_token", await generateAndStoreToken("access_token", account, process.env.ACCESS_TOKEN_SECRET, 1), {
           httpOnly: true,
           secure: false,
           path: "/",
           sameSite: "strict",
-          maxAge: 60 * 1000,
+          maxAge: 1,
         });
 
-        res.cookie("refresh_token", await generateAndStoreToken("refresh_token", account, process.env.REFRESH_TOKEN_SECRET, 15 * 60 * 1000), {
+        res.cookie("refresh_token", await generateAndStoreToken("refresh_token", account, process.env.REFRESH_TOKEN_SECRET, 15), {
           httpOnly: true,
           secure: false,
           path: "/",
           sameSite: "strict",
-          maxAge: 15 * 60 * 1000,
+          maxAge: 15,
         });
 
         return res.status(200).json({ message: "Logged in successfully.", data: { user_id: account.id } });
@@ -131,12 +131,12 @@ const authController = {
 
   getAccessToken: async (req, res) => {
     try {
-      res.cookie("access_token", await generateAndStoreToken("access_token", req.user, process.env.ACCESS_TOKEN_SECRET, 60 * 1000), {
+      res.cookie("access_token", await generateAndStoreToken("access_token", req.user, process.env.ACCESS_TOKEN_SECRET, 1), {
         httpOnly: true,
         secure: false,
         path: "/",
         sameSite: "strict",
-        maxAge: 60 * 1000,
+        maxAge: 1,
       });
 
       return res.status(200).json({ message: "Get access token successfully.", data: null });
@@ -147,12 +147,12 @@ const authController = {
 
   getRefreshToken: async (req, res) => {
     try {
-      res.cookie("refresh_token", await generateAndStoreToken("refresh_token", req.user, process.env.REFRESH_TOKEN_SECRET, 15 * 60 * 1000), {
+      res.cookie("refresh_token", await generateAndStoreToken("refresh_token", req.user, process.env.REFRESH_TOKEN_SECRET, 15), {
         httpOnly: true,
         secure: false,
         path: "/",
         sameSite: "strict",
-        maxAge: 15 * 60 * 1000,
+        maxAge: 15,
       });
 
       return res.status(200).json({ message: "Get refresh token successfully.", data: null });

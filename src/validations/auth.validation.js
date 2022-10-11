@@ -1,37 +1,32 @@
 const Joi = require("joi");
 
 const authValidation = {
-  registerAccount: {
-    body: Joi.object().keys({
-      email: Joi.string().required(),
-      password: Joi.string().min(8).required(),
-      username: Joi.string().required(),
-      full_name: Joi.string().required(),
+  registerAccount: Joi.object({
+    body: Joi.object({
+      full_name: Joi.string().alphanum().min(3).max(50).required(),
       birthday: Joi.string().required(),
-      sex: Joi.string().required(),
+      sex: Joi.string().required().valid("male", "female", "others"),
       address: Joi.string().required(),
-      phone: Joi.string().required(),
+      phone: Joi.string()
+        .pattern(/[0-9]{10}/)
+        .required(),
+      email: Joi.string().email().required(),
+      password: Joi.string().min(8).required(),
     }),
+  }).unknown(true),
 
-    getAccessToken: {
-      body: Joi.object().keys({
-        refreshToken: Joi.string().required(),
-      }),
-    },
-
-    getRefreshToken: {
-      body: Joi.object().keys({
-        refreshToken: Joi.string().required(),
-      }),
-    },
-  },
-
-  loginAccount: {
-    body: Joi.object().keys({
+  loginAccount: Joi.object({
+    body: Joi.object({
       email: Joi.string().required(),
       password: Joi.string().required(),
     }),
-  },
+  }).unknown(true),
+
+  logoutAccount: Joi.object({
+    params: Joi.object({
+      id: Joi.number().required(),
+    }),
+  }).unknown(true),
 };
 
 module.exports = authValidation;
