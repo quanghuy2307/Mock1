@@ -1,6 +1,32 @@
 const { Question } = require("../models/index");
+const { Op } = require("sequelize");
+const { paginationUtility } = require("../utilities/index");
 
 const questionController = {
+  getQuestions: async (req, res) => {
+    try {
+      const { page, size, question } = req.query;
+      const { limit, offset } = paginationUtility.getPagination(parseInt(page), parseInt(size));
+
+      const data = await Question.findAndCountAll({
+        attributes: ["id", "question", "options", "updated_at", "created_at"],
+        where: (condition = question ? { question: { [Op.like]: `%${question}%` } } : null),
+        offset: offset,
+        limit: limit,
+      });
+
+      const response = paginationUtility.getPagingData(data, page, limit);
+
+      if (response.current_items.length) {
+        return res.status(200).json({ message: "Get question successfully.", data: response });
+      } else {
+        return res.status(404).json({ message: "Question not found.", data: null });
+      }
+    } catch (err) {
+      return res.status(500).json({ message: "Internal server error.", data: null });
+    }
+  },
+
   createQuestion: async (req, res) => {
     try {
       const isQuestionValid = await Question.findOne({
@@ -26,26 +52,10 @@ const questionController = {
     }
   },
 
-  getAllQuestion: async (req, res) => {
-    try {
-      const questions = await Question.findAll({
-        attributes: ["id", "question", "options"],
-      });
-
-      if (!questions) {
-        return res.status(404).json({ message: "Question not found.", data: null });
-      } else {
-        return res.status(200).json({ message: "Get all question successfully.", data: questions });
-      }
-    } catch (err) {
-      return res.status(500).json({ message: "Internal server error.", data: null });
-    }
-  },
-
-  getQuestionById: async (req, res) => {
+  getQuestion: async (req, res) => {
     try {
       const question = await Question.findOne({
-        attributes: ["id", "question", "options"],
+        attributes: ["id", "question", "options", "updated_at", "created_at"],
         where: {
           id: parseInt(req.params.id),
         },
@@ -61,7 +71,7 @@ const questionController = {
     }
   },
 
-  updateQuestionById: async (req, res) => {
+  updateQuestion: async (req, res) => {
     try {
       const question = await Question.findOne({
         attributes: ["id"],
@@ -78,6 +88,7 @@ const questionController = {
             question: req.body.question,
             options: req.body.options,
             answers: req.body.answers,
+            updated_at: Date.now(),
           },
           {
             where: {
@@ -93,7 +104,7 @@ const questionController = {
     }
   },
 
-  deleteQuestionById: async (req, res) => {
+  deleteQuestion: async (req, res) => {
     try {
       const question = await Question.findOne({
         attributes: ["id"],

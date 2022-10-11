@@ -1,27 +1,37 @@
 const { User } = require("../models/index");
+const { Op } = require("sequelize");
+const { paginationUtility } = require("../utilities/index");
 const bcrypt = require("bcrypt");
 
 const userController = {
-  getAllUser: async (req, res) => {
+  getUsers: async (req, res) => {
     try {
-      const users = await User.findAll({
-        attributes: ["id", "full_name", "birthday", "sex", "address", "phone", "email", "role"],
+      const { page, size, full_name } = req.query;
+      const { limit, offset } = paginationUtility.getPagination(parseInt(page), parseInt(size));
+
+      const data = await User.findAndCountAll({
+        attributes: ["id", "full_name", "birthday", "sex", "address", "phone", "email", "role", "updated_at", "created_at"],
+        where: (condition = full_name ? { full_name: { [Op.like]: `%${full_name}%` } } : null),
+        offset: offset,
+        limit: limit,
       });
 
-      if (!users.length) {
-        return res.status(404).json({ message: "User not found.", data: null });
+      const response = paginationUtility.getPagingData(data, page, limit);
+
+      if (response.current_items.length) {
+        return res.status(200).json({ message: "Get user successfully.", data: response });
       } else {
-        return res.status(200).json({ message: "Get all question successfully.", data: users });
+        return res.status(404).json({ message: "User not found.", data: null });
       }
     } catch (err) {
       return res.status(500).json({ message: "Internal server error.", data: null });
     }
   },
 
-  getUserById: async (req, res) => {
+  getUser: async (req, res) => {
     try {
       const user = await User.findOne({
-        attributes: ["id", "full_name", "birthday", "sex", "address", "phone", "email", "role"],
+        attributes: ["id", "full_name", "birthday", "sex", "address", "phone", "email", "role", "updated_at", "created_at"],
         where: {
           id: parseInt(req.params.id),
         },
@@ -37,7 +47,7 @@ const userController = {
     }
   },
 
-  updateUserById: async (req, res) => {
+  updateUser: async (req, res) => {
     try {
       const user = await User.findOne({
         attributes: ["id"],
@@ -58,7 +68,7 @@ const userController = {
             phone: req.body.phone,
             email: req.body.email,
             hashed_password: bcrypt.hashSync(req.body.password, 10),
-            role: req.body.role,
+            updated_at: Date.now(),
           },
           {
             where: {
@@ -70,11 +80,12 @@ const userController = {
         return res.status(200).json({ message: "Update user successfully.", data: null });
       }
     } catch (err) {
+      console.log(err);
       return res.status(500).json({ message: "Internal server error.", data: null });
     }
   },
 
-  deleteUserById: async (req, res) => {
+  deleteUser: async (req, res) => {
     try {
       const user = await User.findOne({
         attributes: ["id"],

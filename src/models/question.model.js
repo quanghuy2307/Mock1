@@ -2,6 +2,9 @@ const sequelize = require("../configs/db.config");
 const { Sequelize } = require("sequelize");
 const { Answer } = require("./index");
 
+/**
+ *
+ */
 const Question = sequelize.define(
   "Question",
   {
@@ -42,25 +45,15 @@ const Question = sequelize.define(
   }
 );
 
-/*  */
-Question.hasOne(Answer, {
+/**
+ *
+ */
+Question.hasMany(Answer, {
   foreignKey: "question_id",
 });
 Answer.belongsTo(Question, {
   foreignKey: "question_id",
   targetKey: "id",
 });
-
-// (async () => {
-//   await sequelize
-//     .sync({})
-//     .then(() => {
-//       console.log("Sync Questions Table success!");
-//     })
-//     .catch((err) => {
-//       console.log("Sync Questions Table fail!");
-//       console.log(err);
-//     });
-// })();
 
 module.exports = Question;

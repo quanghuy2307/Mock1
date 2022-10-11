@@ -1,10 +1,21 @@
 const dotenv = require("../configs/env.config");
-const { RefreshToken } = require("../models/index");
+const { Token } = require("../models/index");
 const jwt = require("jsonwebtoken");
 
 const authMiddleware = {
   verifyAccessToken: async (req, res, next) => {
     try {
+      const isAccessTokenValid = await Token.findOne({
+        attributes: ["id"],
+        where: {
+          value: req.headers.access_token,
+        },
+      });
+
+      if (!isAccessTokenValid) {
+        return res.status(401).json({ message: "Invalid refresh token.", data: null });
+      }
+
       jwt.verify(req.headers.access_token, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
         if (err) {
           return res.status(401).json({ message: "Incorrect access token.", data: null });
@@ -19,37 +30,25 @@ const authMiddleware = {
     }
   },
 
-  verifyAccessTokenAndAdmin: async (req, res, next) => {
+  verifyAdmin: async (req, res, next) => {
     try {
-      jwt.verify(req.headers.access_token, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
-        if (err) {
-          return res.status(401).json({ message: "Incorrect access token.", data: null });
-        }
-
-        if (payload.role === "admin") {
-          next();
-        } else {
-          return res.status(401).json({ message: "You're not admin.", data: null });
-        }
-      });
+      if (req.user.role === "admin") {
+        next();
+      } else {
+        return res.status(401).json({ message: "Permission denied.", data: null });
+      }
     } catch (err) {
       return res.status(500).json({ message: "Internal server error.", data: null });
     }
   },
 
-  verifyAccessTokenAndAdminOrBySelf: async (req, res, next) => {
+  verifyAdminOrBySelf: async (req, res, next) => {
     try {
-      jwt.verify(req.headers.access_token, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
-        if (err) {
-          return res.status(401).json({ message: "Incorrect access token.", data: null });
-        }
-
-        if (payload.role == "admin" || payload.id == req.params.id) {
-          next();
-        } else {
-          return res.status(401).json({ message: "Permission denied.", data: null });
-        }
-      });
+      if (req.user.role == "admin" || req.user.id == req.params.id) {
+        next();
+      } else {
+        return res.status(401).json({ message: "Permission denied.", data: null });
+      }
     } catch (err) {
       return res.status(500).json({ message: "Internal server error.", data: null });
     }
@@ -57,19 +56,20 @@ const authMiddleware = {
 
   verifyRefreshToken: async (req, res, next) => {
     try {
-      const val = RefreshToken.findOne({
+      const isRefreshTokenValid = await Token.findOne({
+        attributes: ["id"],
         where: {
-          content: req.headers.refresh_token,
+          value: req.headers.refresh_token,
         },
       });
 
-      if (!val) {
-        return reject(res.status(401).json({ message: "Invalid refresh token.", data: null }));
+      if (!isRefreshTokenValid) {
+        return res.status(401).json({ message: "Invalid refresh token.", data: null });
       }
 
       jwt.verify(req.headers.refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, payload) => {
         if (err) {
-          return reject(res.status(401).json({ message: "Incorrect refresh token.", data: null }));
+          return res.status(401).json({ message: "Incorrect refresh token.", data: null });
         }
 
         req.user = payload;
@@ -77,7 +77,6 @@ const authMiddleware = {
         next();
       });
     } catch (err) {
-      console.log(err);
       return res.status(500).json({ message: "Internal server error.", data: null });
     }
   },

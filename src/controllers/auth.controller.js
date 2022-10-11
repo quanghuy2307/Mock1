@@ -1,22 +1,48 @@
 const dotenv = require("../configs/env.config");
-const { User, RefreshToken, Result } = require("../models/index");
+const { User, Token } = require("../models/index");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-/* Hàm này chuyển sang phần utils sau */
-const generateToken = (user, secret, expiresIn) => {
-  return jwt.sign(
-    {
-      id: parseInt(user.id),
-      role: user.role,
+/**
+ *
+ */
+const generateAndStoreToken = async (type, payload, secret, expiresIn) => {
+  const isTokenExist = await Token.findOne({
+    attributes: ["id"],
+    where: {
+      user_id: parseInt(payload.id),
+      type: type,
     },
-    secret,
-    { expiresIn: expiresIn }
-  );
+  });
+
+  if (isTokenExist) {
+    await Token.destroy({
+      where: {
+        user_id: parseInt(payload.id),
+        type: type,
+      },
+    });
+  }
+
+  const newToken = await Token.create({
+    value: jwt.sign(
+      {
+        id: parseInt(payload.id),
+        role: payload.role,
+      },
+      secret,
+      { expiresIn: expiresIn }
+    ),
+    user_id: parseInt(payload.id),
+    type: type,
+    expired_in: expiresIn,
+  });
+
+  return newToken.value;
 };
 
 const authController = {
-  registerAccount: async (req, res, next) => {
+  registerAccount: async (req, res) => {
     try {
       const isEmailExist = await User.findOne({
         where: {
@@ -37,22 +63,14 @@ const authController = {
           hashed_password: bcrypt.hashSync(req.body.password, 10),
         });
 
-        await RefreshToken.create({
-          user_id: parseInt(newAccount.id),
-        });
-
-        await Result.create({
-          user_id: parseInt(newAccount.id),
-        });
-
-        return res.status(200).json({ message: "Create account successfully.", data: { id: newAccount.id } });
+        return res.status(200).json({ message: "Create account successfully.", data: { user_id: newAccount.id } });
       }
     } catch (err) {
-      return res.status(500).json({ message: "Internal server error.", data: {} });
+      return res.status(500).json({ message: "Internal server error.", data: null });
     }
   },
 
-  loginAccount: async (req, res, next) => {
+  loginAccount: async (req, res) => {
     try {
       const account = await User.findOne({
         where: {
@@ -71,50 +89,39 @@ const authController = {
       }
 
       if (account && isPasswordCorrect) {
-        const accessToken = generateToken(account, process.env.ACCESS_TOKEN_SECRET, process.env.ACCESS_TOKEN_EXPIRED);
-        const refreshToken = generateToken(account, process.env.REFRESH_TOKEN_SECRET, process.env.REFRESH_TOKEN_EXPIRED);
-
-        await RefreshToken.update(
-          {
-            content: refreshToken,
-            expired_in: process.env.REFRESH_TOKEN_EXPIRED,
-          },
-          {
-            where: {
-              id: parseInt(account.id),
-            },
-          }
-        );
-
-        res.cookie("refresh_token", refreshToken, {
+        res.cookie("access_token", await generateAndStoreToken("access_token", account, process.env.ACCESS_TOKEN_SECRET, 60 * 1000), {
           httpOnly: true,
           secure: false,
           path: "/",
           sameSite: "strict",
+          maxAge: 60 * 1000,
         });
 
-        return res.status(200).json({ message: "Logged in successfully.", data: { access_token: accessToken, refresh_token: refreshToken } });
+        res.cookie("refresh_token", await generateAndStoreToken("refresh_token", account, process.env.REFRESH_TOKEN_SECRET, 15 * 60 * 1000), {
+          httpOnly: true,
+          secure: false,
+          path: "/",
+          sameSite: "strict",
+          maxAge: 15 * 60 * 1000,
+        });
+
+        return res.status(200).json({ message: "Logged in successfully.", data: { user_id: account.id } });
       }
     } catch (err) {
       return res.status(500).json({ message: "Internal server error.", data: null });
     }
   },
 
-  logoutAccount: async (req, res, next) => {
+  logoutAccount: async (req, res) => {
     try {
-      await RefreshToken.update(
-        {
-          content: "",
-          expired_in: "",
+      await Token.destroy({
+        where: {
+          user_id: parseInt(req.params.id),
         },
-        {
-          where: {
-            id: parseInt(req.body.id),
-          },
-        }
-      );
+      });
 
       res.clearCookie("refresh_token");
+      res.clearCookie("access_token");
 
       return res.status(200).json({ message: "Logged out successfully.", data: null });
     } catch (err) {
@@ -122,40 +129,33 @@ const authController = {
     }
   },
 
-  getAccessToken: async (req, res, next) => {
+  getAccessToken: async (req, res) => {
     try {
-      const accessToken = generateToken(req.user, process.env.ACCESS_TOKEN_SECRET, process.env.ACCESS_TOKEN_EXPIRED);
-
-      return res.status(200).json({ message: "Logged out successfully.", data: { access_token: accessToken } });
-    } catch (err) {
-      return res.status(500).json({ message: "Internal server error.", data: null });
-    }
-  },
-
-  getRefreshToken: async (req, res, next) => {
-    try {
-      const refreshToken = generateToken(req.user, process.env.REFRESH_TOKEN_SECRET, process.env.REFRESH_TOKEN_EXPIRED);
-
-      await RefreshToken.update(
-        {
-          content: refreshToken,
-          expired_in: process.env.REFRESH_TOKEN_EXPIRED,
-        },
-        {
-          where: {
-            id: parseInt(req.user.id),
-          },
-        }
-      );
-
-      res.cookie("refresh_token", refreshToken, {
+      res.cookie("access_token", await generateAndStoreToken("access_token", req.user, process.env.ACCESS_TOKEN_SECRET, 60 * 1000), {
         httpOnly: true,
         secure: false,
         path: "/",
         sameSite: "strict",
+        maxAge: 60 * 1000,
       });
 
-      return res.status(200).json({ message: "Logged out successfully.", data: null });
+      return res.status(200).json({ message: "Get access token successfully.", data: null });
+    } catch (err) {
+      return res.status(500).json({ message: "Internal server error.", data: null });
+    }
+  },
+
+  getRefreshToken: async (req, res) => {
+    try {
+      res.cookie("refresh_token", await generateAndStoreToken("refresh_token", req.user, process.env.REFRESH_TOKEN_SECRET, 15 * 60 * 1000), {
+        httpOnly: true,
+        secure: false,
+        path: "/",
+        sameSite: "strict",
+        maxAge: 15 * 60 * 1000,
+      });
+
+      return res.status(200).json({ message: "Get refresh token successfully.", data: null });
     } catch (err) {
       return res.status(500).json({ message: "Internal server error.", data: null });
     }

@@ -4,8 +4,8 @@ const { Sequelize } = require("sequelize");
 /**
  *
  */
-const Result = sequelize.define(
-  "Result",
+const Token = sequelize.define(
+  "Token",
   {
     id: {
       type: Sequelize.BIGINT,
@@ -17,30 +17,18 @@ const Result = sequelize.define(
       type: Sequelize.BIGINT,
       allowNull: false,
     },
-    turn: {
+    value: {
+      type: Sequelize.TEXT,
+      allowNull: false,
+    },
+    type: {
+      type: Sequelize.ENUM("access_token", "refresh_token"),
+      defaultValue: "access",
+      allowNull: false,
+    },
+    expired_in: {
       type: Sequelize.BIGINT,
-      allowNull: false,
-    },
-    total: {
-      type: Sequelize.BIGINT,
-      allowNull: false,
-    },
-    total_correct: {
-      type: Sequelize.BIGINT,
-      allowNull: false,
-    },
-    total_incorrect: {
-      type: Sequelize.BIGINT,
-      allowNull: false,
-    },
-    corrects: {
-      type: Sequelize.ARRAY(Sequelize.BIGINT),
-      defaultValue: [],
-      allowNull: false,
-    },
-    incorrects: {
-      type: Sequelize.ARRAY(Sequelize.BIGINT),
-      defaultValue: [],
+      defaultValue: 0,
       allowNull: false,
     },
     created_at: {
@@ -54,4 +42,4 @@ const Result = sequelize.define(
   }
 );
 
-module.exports = Result;
+module.exports = Token;

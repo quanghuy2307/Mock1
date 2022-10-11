@@ -1,10 +1,18 @@
 const sequelize = require("../configs/db.config");
 const { Sequelize } = require("sequelize");
 
-/* Người dùng khi trả lời sẽ tạo ra bảng này */
+/**
+ *
+ */
 const Answer = sequelize.define(
   "Answer",
   {
+    id: {
+      type: Sequelize.BIGINT,
+      primaryKey: true,
+      autoIncrement: true,
+      allowNull: false,
+    },
     user_id: {
       type: Sequelize.BIGINT,
       allowNull: false,
@@ -18,7 +26,11 @@ const Answer = sequelize.define(
       defaultValue: [],
       allowNull: false,
     },
-    updated_at: {
+    turn: {
+      type: Sequelize.BIGINT,
+      allowNull: false,
+    },
+    created_at: {
       type: Sequelize.DATE,
       defaultValue: Sequelize.fn("NOW"),
       allowNull: false,
@@ -28,17 +40,5 @@ const Answer = sequelize.define(
     timestamps: false,
   }
 );
-
-// (async () => {
-//   await sequelize
-//     .sync({})
-//     .then(() => {
-//       console.log("Sync Answers Table success!");
-//     })
-//     .catch((err) => {
-//       console.log("Sync Answers Table fail!");
-//       console.log(err);
-//     });
-// })();
 
 module.exports = Answer;

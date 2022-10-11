@@ -1,8 +1,10 @@
 const sequelize = require("../configs/db.config");
 const { Sequelize } = require("sequelize");
-const { Result, Answer, RefreshToken } = require("./index");
+const { Result, Answer, Token } = require("./index");
 
-/* Người dùng khi đăng ký sẽ tạo ra bảng này */
+/**
+ *
+ */
 const User = sequelize.define(
   "User",
   {
@@ -63,17 +65,21 @@ const User = sequelize.define(
   }
 );
 
-/*  */
-User.hasOne(RefreshToken, {
+/**
+ *
+ */
+User.hasOne(Token, {
   foreignKey: "user_id",
 });
-RefreshToken.belongsTo(User, {
+Token.belongsTo(User, {
   foreignKey: "user_id",
   targetKey: "id",
 });
 
-/*  */
-User.hasOne(Result, {
+/**
+ *
+ */
+User.hasMany(Result, {
   foreignKey: "user_id",
 });
 Result.belongsTo(User, {
@@ -81,7 +87,9 @@ Result.belongsTo(User, {
   targetKey: "id",
 });
 
-/*  */
+/**
+ *
+ */
 User.hasMany(Answer, {
   foreignKey: "user_id",
 });
@@ -89,17 +97,5 @@ Answer.belongsTo(User, {
   foreignKey: "user_id",
   targetKey: "id",
 });
-
-// (async () => {
-//   await sequelize
-//     .sync({})
-//     .then(() => {
-//       console.log("Sync Users Table success!");
-//     })
-//     .catch((err) => {
-//       console.log("Sync Users Table fail!");
-//       console.log(err);
-//     });
-// })();
 
 module.exports = User;

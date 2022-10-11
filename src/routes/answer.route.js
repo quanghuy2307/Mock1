@@ -5,21 +5,16 @@ const { authMiddleware } = require("../middlewares/index");
 /**
  * Gửi câu trả lời lên (admin/user)
  */
-answerRouter.post("/:id", authMiddleware.verifyAccessTokenAndAdminOrBySelf, answerController.createAnswer);
+answerRouter.post("/:id", authMiddleware.verifyAccessToken, authMiddleware.verifyAdminOrBySelf, answerController.createAnswer);
 
 /**
  * Xem lại câu trả lời sau khi nộp (admin/user)
  */
-answerRouter.get("/:id", authMiddleware.verifyAccessTokenAndAdminOrBySelf, answerController.getAnswer);
-
-/**
- * Thay đổi câu trả lời sau khi nộp (admin/user)
- */
-answerRouter.put("/:id", authMiddleware.verifyAccessTokenAndAdminOrBySelf, answerController.updateAnswer);
+answerRouter.get("/:id", authMiddleware.verifyAccessToken, authMiddleware.verifyAdminOrBySelf, answerController.getAnswer);
 
 /**
  * Xóa câu trả lời sau khi nộp (admin)
  */
-answerRouter.delete("/:id", authMiddleware.verifyAccessTokenAndAdmin, answerController.deleteAnswer);
+answerRouter.delete("/:id", authMiddleware.verifyAccessToken, authMiddleware.verifyAdmin, answerController.deleteAnswer);
 
 module.exports = answerRouter;
