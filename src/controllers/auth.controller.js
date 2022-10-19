@@ -2,11 +2,12 @@ const dotenv = require("../configs/env.config");
 const { User, Token } = require("../models/index");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const responseUtility = require("../utilities/response.utility");
 
 /**
- *
+ * Tạo token rồi lưu vào DB và cookie
  */
-const generateAndStoreToken = async (type, payload, secret, expiresIn) => {
+const generateAndStoreToken = async (res, type, payload, secret, expiresIn) => {
   const isTokenExist = await Token.findOne({
     attributes: ["id"],
     where: {
@@ -38,7 +39,13 @@ const generateAndStoreToken = async (type, payload, secret, expiresIn) => {
     expired_in: expiresIn,
   });
 
-  return newToken.value;
+  res.cookie("access_token", newToken.value, {
+    httpOnly: true,
+    secure: false,
+    path: "/",
+    sameSite: "strict",
+    maxAge: expiresIn * 1000,
+  });
 };
 
 const authController = {
@@ -51,22 +58,21 @@ const authController = {
       });
 
       if (isEmailExist) {
-        return res.status(400).json({ message: "Email already exists.", data: null });
+        responseUtility.response(res, 400, "Email already exists.", null);
       } else {
+        const { password, ...userInfor } = req.body;
+
         const newAccount = await User.create({
-          full_name: req.body.full_name,
-          birthday: req.body.birthday,
-          sex: req.body.sex,
-          address: req.body.address,
-          phone: req.body.phone,
-          email: req.body.email,
+          ...userInfor,
           hashed_password: bcrypt.hashSync(req.body.password, 10),
         });
 
-        return res.status(200).json({ message: "Create account successfully.", data: { user_id: newAccount.id } });
+        const { hashed_password, data } = newAccount;
+
+        responseUtility.response(res, 200, "Create account successfully.", data);
       }
     } catch (err) {
-      return res.status(500).json({ message: "Internal server error.", data: null });
+      responseUtility.response(res, 500, "Internal server error.", null);
     }
   },
 
@@ -79,36 +85,25 @@ const authController = {
       });
 
       if (!account) {
-        return res.status(401).json({ message: "Email does not exist.", data: null });
+        responseUtility.response(res, 404, "Email does not exist.", null);
       }
 
       const isPasswordCorrect = bcrypt.compareSync(req.body.password, account.hashed_password);
 
       if (!isPasswordCorrect) {
-        return res.status(401).json({ message: "Incorrect password.", data: null });
+        responseUtility.response(res, 401, "Incorrect password.", null);
       }
 
       if (account && isPasswordCorrect) {
-        res.cookie("access_token", await generateAndStoreToken("access_token", account, process.env.ACCESS_TOKEN_SECRET, 1), {
-          httpOnly: true,
-          secure: false,
-          path: "/",
-          sameSite: "strict",
-          maxAge: 1,
-        });
+        generateAndStoreToken(res, "access_token", account, process.env.ACCESS_TOKEN_SECRET, 60);
+        generateAndStoreToken(res, "refresh_token", account, process.env.REFRESH_TOKEN_SECRET, 15 * 60);
 
-        res.cookie("refresh_token", await generateAndStoreToken("refresh_token", account, process.env.REFRESH_TOKEN_SECRET, 15), {
-          httpOnly: true,
-          secure: false,
-          path: "/",
-          sameSite: "strict",
-          maxAge: 15,
-        });
+        const { hashed_password, data } = account;
 
-        return res.status(200).json({ message: "Logged in successfully.", data: { user_id: account.id } });
+        responseUtility.response(res, 200, "Logged in successfully.", data);
       }
     } catch (err) {
-      return res.status(500).json({ message: "Internal server error.", data: null });
+      responseUtility.response(res, 500, "Internal server error.", null);
     }
   },
 
@@ -123,41 +118,29 @@ const authController = {
       res.clearCookie("refresh_token");
       res.clearCookie("access_token");
 
-      return res.status(200).json({ message: "Logged out successfully.", data: null });
+      responseUtility.response(res, 200, "Logged out successfully.", null);
     } catch (err) {
-      return res.status(500).json({ message: "Internal server error.", data: null });
+      responseUtility.response(res, 500, "Internal server error.", null);
     }
   },
 
   getAccessToken: async (req, res) => {
     try {
-      res.cookie("access_token", await generateAndStoreToken("access_token", req.user, process.env.ACCESS_TOKEN_SECRET, 1), {
-        httpOnly: true,
-        secure: false,
-        path: "/",
-        sameSite: "strict",
-        maxAge: 1,
-      });
+      generateAndStoreToken(res, "access_token", account, process.env.ACCESS_TOKEN_SECRET, 60);
 
-      return res.status(200).json({ message: "Get access token successfully.", data: null });
+      responseUtility.response(res, 200, "Get access token successfully.", null);
     } catch (err) {
-      return res.status(500).json({ message: "Internal server error.", data: null });
+      responseUtility.response(res, 500, "Internal server error.", null);
     }
   },
 
   getRefreshToken: async (req, res) => {
     try {
-      res.cookie("refresh_token", await generateAndStoreToken("refresh_token", req.user, process.env.REFRESH_TOKEN_SECRET, 15), {
-        httpOnly: true,
-        secure: false,
-        path: "/",
-        sameSite: "strict",
-        maxAge: 15,
-      });
+      generateAndStoreToken(res, "refresh_token", account, process.env.REFRESH_TOKEN_SECRET, 15 * 60);
 
-      return res.status(200).json({ message: "Get refresh token successfully.", data: null });
+      responseUtility.response(res, 200, "Get refresh token successfully.", null);
     } catch (err) {
-      return res.status(500).json({ message: "Internal server error.", data: null });
+      responseUtility.response(res, 500, "Internal server error.", null);
     }
   },
 };

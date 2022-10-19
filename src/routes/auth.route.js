@@ -20,11 +20,11 @@ authRouter.get("/logout/:id", authMiddleware.verifyAccessToken, authMiddleware.v
 /**
  * Lấy access token (user/admin)
  */
-authRouter.post("/access_token", authMiddleware.verifyRefreshToken, authController.getAccessToken);
+authRouter.get("/access_token", authMiddleware.verifyRefreshToken, authController.getAccessToken);
 
 /**
  * Lấy refresh token (user/admin)
  */
-authRouter.post("/refresh_token", authMiddleware.verifyAccessToken, authMiddleware.verifyRefreshToken, authController.getRefreshToken);
+authRouter.get("/refresh_token", authMiddleware.verifyAccessToken, authMiddleware.verifyRefreshToken, authController.getRefreshToken);
 
 module.exports = authRouter;

@@ -1,6 +1,7 @@
 const { Question } = require("../models/index");
 const { Op } = require("sequelize");
 const { paginationUtility } = require("../utilities/index");
+const responseUtility = require("../utilities/response.utility");
 
 const questionController = {
   getQuestions: async (req, res) => {
@@ -18,12 +19,12 @@ const questionController = {
       const response = paginationUtility.getPagingData(data, page, limit);
 
       if (response.current_items.length) {
-        return res.status(200).json({ message: "Get question successfully.", data: response });
+        responseUtility.response(res, 200, "Get question successfully.", { response });
       } else {
-        return res.status(404).json({ message: "Question not found.", data: null });
+        responseUtility.response(res, 404, "Question not found.", null);
       }
     } catch (err) {
-      return res.status(500).json({ message: "Internal server error.", data: null });
+      responseUtility.response(res, 500, "Internal server error.", null);
     }
   },
 
@@ -37,7 +38,7 @@ const questionController = {
       });
 
       if (isQuestionValid) {
-        return res.status(404).json({ message: "Question is valid.", data: null });
+        responseUtility.response(res, 400, "Question already exists.", null);
       } else {
         const newQuestion = await Question.create({
           question: req.body.question,
@@ -45,10 +46,10 @@ const questionController = {
           answers: req.body.answers,
         });
 
-        return res.status(200).json({ message: "Create question successfully.", data: { id: newQuestion.id } });
+        responseUtility.response(res, 201, "Question successfully created.", { id: newQuestion.id });
       }
     } catch (err) {
-      return res.status(500).json({ message: "Internal server error.", data: null });
+      responseUtility.response(res, 500, "Internal server error.", null);
     }
   },
 
@@ -62,12 +63,12 @@ const questionController = {
       });
 
       if (!question) {
-        return res.status(404).json({ message: "Question not found.", data: null });
+        responseUtility.response(res, 404, "Question not found.", null);
       } else {
-        return res.status(200).json({ message: "Get question successfully.", data: question });
+        responseUtility.response(res, 200, "Get question successfully.", question);
       }
     } catch (err) {
-      return res.status(500).json({ message: "Internal server error.", data: null });
+      responseUtility.response(res, 500, "Internal server error.", null);
     }
   },
 
@@ -81,7 +82,7 @@ const questionController = {
       });
 
       if (!question) {
-        return res.status(404).json({ message: "Question not found.", data: null });
+        responseUtility.response(res, 404, "Question not found.", null);
       } else {
         await Question.update(
           {
@@ -97,10 +98,10 @@ const questionController = {
           }
         );
 
-        return res.status(200).json({ message: "Update question successfully.", data: null });
+        responseUtility.response(res, 200, "Question successfully updated.", null);
       }
     } catch (err) {
-      return res.status(500).json({ message: "Internal server error.", data: null });
+      responseUtility.response(res, 500, "Internal server error.", null);
     }
   },
 
@@ -114,7 +115,7 @@ const questionController = {
       });
 
       if (!question) {
-        return res.status(404).json({ message: "Question not found.", data: null });
+        responseUtility.response(res, 404, "Question not found.", null);
       } else {
         await Question.destroy({
           where: {
@@ -122,10 +123,10 @@ const questionController = {
           },
         });
 
-        return res.status(200).json({ message: "Delete question successfully.", data: null });
+        responseUtility.response(res, 200, "Question successfully deleted.", null);
       }
     } catch (err) {
-      return res.status(500).json({ message: "Internal server error.", data: null });
+      responseUtility.response(res, 500, "Internal server error.", null);
     }
   },
 };

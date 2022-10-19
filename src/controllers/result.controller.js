@@ -1,4 +1,5 @@
 const { Result } = require("../models/index");
+const responseUtility = require("../utilities/response.utility");
 
 const resultController = {
   getResults: async (req, res) => {
@@ -8,12 +9,12 @@ const resultController = {
       });
 
       if (!results.length) {
-        return res.status(404).json({ message: "Result not found.", data: null });
+        responseUtility.response(res, 404, "Result not found.", null);
       } else {
-        return res.status(200).json({ message: "Get result successfully.", data: results });
+        responseUtility.response(res, 200, "Get result successfully.", results);
       }
     } catch (err) {
-      return res.status(500).json({ message: "Internal server error.", data: null });
+      responseUtility.response(res, 500, "Internal server error.", null);
     }
   },
 
@@ -27,12 +28,12 @@ const resultController = {
       });
 
       if (!results.length) {
-        return res.status(404).json({ message: "Result not found.", data: null });
+        responseUtility.response(res, 404, "Result not found.", null);
       } else {
-        return res.status(200).json({ message: "Get result successfully.", data: results });
+        responseUtility.response(res, 200, "Get result successfully.", results);
       }
     } catch (err) {
-      return res.status(500).json({ message: "Internal server error.", data: null });
+      responseUtility.response(res, 500, "Internal server error.", null);
     }
   },
 };

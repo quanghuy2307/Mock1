@@ -1,5 +1,6 @@
 const { Answer, Result, Question } = require("../models/index");
 const _ = require("lodash");
+const responseUtility = require("../utilities/response.utility");
 
 const answerController = {
   createAnswer: async (req, res) => {
@@ -14,12 +15,14 @@ const answerController = {
 
       const newTurn = previousAnswer ? parseInt(previousAnswer.turn) + 1 : 1;
 
-      req.body.answers.forEach((answer) => {
-        answer.user_id = parseInt(req.params.id);
-        answer.turn = newTurn;
+      req.body.answers.forEach(async (answer) => {
+        await Answer.create({
+          user_id: parseInt(req.user.id),
+          turn: newTurn,
+          question_id: parseInt(answer.question_id),
+          choices: answer.choices,
+        });
       });
-
-      await Answer.bulkCreate(req.body.answers);
 
       const newAnswer = await Answer.findAll({
         attributes: ["question_id", "choices"],
@@ -56,9 +59,9 @@ const answerController = {
         incorrects: incorrects,
       });
 
-      return res.status(200).json({ message: "Create answer successfully.", data: null });
+      responseUtility.response(res, 200, "Create answer successfully.", null);
     } catch (err) {
-      return res.status(500).json({ message: "Internal server error.", data: null });
+      responseUtility.response(res, 500, "Internal server error.", null);
     }
   },
 
@@ -72,12 +75,12 @@ const answerController = {
       });
 
       if (!answers.length) {
-        return res.status(404).json({ message: "Answer not found.", data: null });
+        responseUtility.response(res, 200, "Answer not found.", null);
       } else {
-        return res.status(200).json({ message: "Get answer successfully.", data: answers });
+        responseUtility.response(res, 200, "Get answer successfully.", answers);
       }
     } catch (err) {
-      return res.status(500).json({ message: "Internal server error.", data: null });
+      responseUtility.response(res, 500, "Internal server error.", null);
     }
   },
 
@@ -91,7 +94,7 @@ const answerController = {
       });
 
       if (!isAnswerValid) {
-        return res.status(404).json({ message: "Answer not found.", data: null });
+        responseUtility.response(res, 404, "Answer not found.", null);
       } else {
         await Answer.destroy({
           where: {
@@ -105,10 +108,10 @@ const answerController = {
           },
         });
 
-        return res.status(200).json({ message: "Delete answer successfully.", data: null });
+        responseUtility.response(res, 200, "Delete answer successfully.", null);
       }
     } catch (err) {
-      return res.status(500).json({ message: "Internal server error.", data: null });
+      responseUtility.response(res, 500, "Internal server error.", null);
     }
   },
 };
