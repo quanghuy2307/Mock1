@@ -42,12 +42,12 @@ sequelize
   .authenticate()
   .then(() => {
     console.log("Connect DB success.");
-    app.listen(process.env.PORT, () => {
-      console.log(`App listening at localhost:${process.env.PORT}.`);
-    });
   })
   .catch(() => logger.error(`Connect DB fail ${process.env.PORT}.`));
 
+/**
+ *
+ */
 sequelize
   .sync({
     /* alter: true */
@@ -57,5 +57,11 @@ sequelize
   })
   .catch((err) => {
     console.log("Sync Tables fail!");
-    console.log(err);
   });
+
+/**
+ *
+ */
+app.listen(process.env.PORT, () => {
+  console.log(`App listening at localhost:${process.env.PORT}.`);
+});

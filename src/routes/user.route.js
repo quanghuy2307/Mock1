@@ -6,21 +6,21 @@ const { userValidation } = require("../validations/index");
 /**
  * Lấy tất cả user (admin)
  */
-userRouter.get("/", authMiddleware.verifyAccessToken, authMiddleware.verifyAdmin, validationMiddleware.validate(userValidation.getUsers), userController.getUsers);
+userRouter.get("/", authMiddleware.verifyTokens(["access_token"]), authMiddleware.verifyPiorities(["admin"]), validationMiddleware.validate(userValidation.getUsers), userController.getUsers);
 
 /**
  * Lấy thông tin user (admin/user)
  */
-userRouter.get("/:id", authMiddleware.verifyAccessToken, authMiddleware.verifyAdminOrBySelf, validationMiddleware.validate(userValidation.getUser), userController.getUser);
+userRouter.get("/:id", authMiddleware.verifyTokens(["access_token"]), authMiddleware.verifyPiorities(["admin", "user"]), validationMiddleware.validate(userValidation.getUser), userController.getUser);
 
 /**
  * Cập nhật user (admin/user)
  */
-userRouter.put("/:id", authMiddleware.verifyAccessToken, authMiddleware.verifyAdminOrBySelf, validationMiddleware.validate(userValidation.updateUser), userController.updateUser);
+userRouter.put("/:id", authMiddleware.verifyTokens(["access_token"]), authMiddleware.verifyPiorities(["admin", "user"]), validationMiddleware.validate(userValidation.updateUser), userController.updateUser);
 
 /**
  * Xóa user (admin)
  */
-userRouter.delete("/:id", authMiddleware.verifyAccessToken, authMiddleware.verifyAdmin, validationMiddleware.validate(userValidation.deleteUser), userController.deleteUser);
+userRouter.delete("/:id", authMiddleware.verifyTokens(["access_token"]), authMiddleware.verifyPiorities(["admin"]), validationMiddleware.validate(userValidation.deleteUser), userController.deleteUser);
 
 module.exports = userRouter;

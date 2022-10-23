@@ -11,7 +11,7 @@ const userController = {
       const { limit, offset } = paginationUtility.getPagination(parseInt(page), parseInt(size));
 
       const data = await User.findAndCountAll({
-        attributes: ["id", "full_name", "birthday", "sex", "address", "phone", "email", "role", "updated_at", "created_at"],
+        attributes: ["id", "full_name", "birthday", "sex", "address", "phone", "email", "roles", "updated_at", "created_at"],
         where: (condition = full_name ? { full_name: { [Op.like]: `%${full_name}%` } } : null),
         offset: offset,
         limit: limit,
@@ -20,31 +20,31 @@ const userController = {
       const response = paginationUtility.getPagingData(data, page, limit);
 
       if (response.current_items.length) {
-        responseUtility.response(res, 200, "Get user successfully.", response);
+        return responseUtility.response(res, 200, "Get user successfully.", response);
       } else {
-        responseUtility.response(res, 404, "User not found.", null);
+        return responseUtility.response(res, 404, "User not found.", null);
       }
     } catch (err) {
-      responseUtility.response(res, 500, "Internal server error.", null);
+      return responseUtility.response(res, 500, "Internal server error.", null);
     }
   },
 
   getUser: async (req, res) => {
     try {
       const userInfor = await User.findOne({
-        attributes: ["id", "full_name", "birthday", "sex", "address", "phone", "email", "role", "updated_at", "created_at"],
+        attributes: ["id", "full_name", "birthday", "sex", "address", "phone", "email", "roles", "updated_at", "created_at"],
         where: {
-          id: parseInt(req.params.id),
+          id: req.params.id,
         },
       });
 
       if (!userInfor) {
-        responseUtility.response(res, 404, "User not found.", null);
+        return responseUtility.response(res, 404, "User not found.", null);
       } else {
-        responseUtility.response(res, 200, "Get user successfully.", userInfor);
+        return responseUtility.response(res, 200, "Get user successfully.", userInfor);
       }
     } catch (err) {
-      responseUtility.response(res, 500, "Internal server error.", null);
+      return responseUtility.response(res, 500, "Internal server error.", null);
     }
   },
 
@@ -53,7 +53,7 @@ const userController = {
       const userID = await User.findByPk(parseInt(req.params.id));
 
       if (!userID) {
-        responseUtility.response(res, 404, "User not found.", null);
+        return responseUtility.response(res, 404, "User not found.", null);
       } else {
         const { password, ...userInfor } = req.body;
 
@@ -70,10 +70,17 @@ const userController = {
           }
         );
 
-        responseUtility.response(res, 200, "Update user successfully.", null);
+        const newUserInfor = await User.findOne({
+          attributes: ["id", "full_name", "birthday", "sex", "address", "phone", "email", "roles", "updated_at", "created_at"],
+          where: {
+            id: req.params.id,
+          },
+        });
+
+        return responseUtility.response(res, 200, "Update user successfully.", newUserInfor);
       }
     } catch (err) {
-      responseUtility.response(res, 500, "Internal server error.", null);
+      return responseUtility.response(res, 500, "Internal server error.", null);
     }
   },
 
@@ -82,7 +89,7 @@ const userController = {
       const userID = await User.findByPk(parseInt(req.params.id));
 
       if (!userID) {
-        return res.status(404).json({ message: "User not found.", data: null });
+        return responseUtility.response(res, 404, "User not found.", null);
       } else {
         await User.destroy({
           where: {
@@ -90,10 +97,10 @@ const userController = {
           },
         });
 
-        responseUtility.response(res, 200, "Delete user successfully.", null);
+        return responseUtility.response(res, 200, "Delete user successfully.", null);
       }
     } catch (err) {
-      responseUtility.response(res, 500, "Internal server error.", null);
+      return responseUtility.response(res, 500, "Internal server error.", null);
     }
   },
 
@@ -103,9 +110,9 @@ const userController = {
         truncate: true,
       });
 
-      responseUtility.response(res, 200, "Delete users successfully.", null);
+      return responseUtility.response(res, 200, "Delete users successfully.", null);
     } catch (err) {
-      responseUtility.response(res, 500, "Internal server error.", null);
+      return responseUtility.response(res, 500, "Internal server error.", null);
     }
   },
 };

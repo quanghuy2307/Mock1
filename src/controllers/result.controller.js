@@ -9,12 +9,12 @@ const resultController = {
       });
 
       if (!results.length) {
-        responseUtility.response(res, 404, "Result not found.", null);
+        return responseUtility.response(res, 404, "Result not found.", null);
       } else {
-        responseUtility.response(res, 200, "Get result successfully.", results);
+        return responseUtility.response(res, 200, "Get result successfully.", results);
       }
     } catch (err) {
-      responseUtility.response(res, 500, "Internal server error.", null);
+      return responseUtility.response(res, 500, "Internal server error.", null);
     }
   },
 
@@ -23,17 +23,17 @@ const resultController = {
       const results = await Result.findAll({
         attributes: ["total", "total_correct", "total_incorrect", "corrects", "incorrects", "turn", "created_at"],
         where: {
-          user_id: parseInt(req.params.id),
+          user_id: req.params.id,
         },
       });
 
       if (!results.length) {
-        responseUtility.response(res, 404, "Result not found.", null);
+        return responseUtility.response(res, 404, "Result not found.", null);
       } else {
-        responseUtility.response(res, 200, "Get result successfully.", results);
+        return responseUtility.response(res, 200, "Get result successfully.", results);
       }
     } catch (err) {
-      responseUtility.response(res, 500, "Internal server error.", null);
+      return responseUtility.response(res, 500, "Internal server error.", null);
     }
   },
 };

@@ -58,7 +58,7 @@ const questionController = {
       const question = await Question.findOne({
         attributes: ["id", "question", "options", "updated_at", "created_at"],
         where: {
-          id: parseInt(req.params.id),
+          id: req.params.id,
         },
       });
 
@@ -74,14 +74,9 @@ const questionController = {
 
   updateQuestion: async (req, res) => {
     try {
-      const question = await Question.findOne({
-        attributes: ["id"],
-        where: {
-          id: parseInt(req.params.id),
-        },
-      });
+      const questionID = await Question.findByPk(req.params.id);
 
-      if (!question) {
+      if (!questionID) {
         responseUtility.response(res, 404, "Question not found.", null);
       } else {
         await Question.update(
@@ -93,7 +88,7 @@ const questionController = {
           },
           {
             where: {
-              id: parseInt(req.params.id),
+              id: questionID,
             },
           }
         );
@@ -107,19 +102,14 @@ const questionController = {
 
   deleteQuestion: async (req, res) => {
     try {
-      const question = await Question.findOne({
-        attributes: ["id"],
-        where: {
-          id: parseInt(req.params.id),
-        },
-      });
+      const questionID = await Question.findByPk(req.params.id);
 
-      if (!question) {
+      if (!questionID) {
         responseUtility.response(res, 404, "Question not found.", null);
       } else {
         await Question.destroy({
           where: {
-            id: parseInt(req.params.id),
+            id: questionID,
           },
         });
 

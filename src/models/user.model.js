@@ -44,9 +44,9 @@ const User = sequelize.define(
       type: Sequelize.TEXT,
       allowNull: false,
     },
-    role: {
-      type: Sequelize.ENUM("user", "admin"),
-      defaultValue: "user",
+    roles: {
+      type: Sequelize.ARRAY(Sequelize.STRING),
+      defaultValue: ["user"],
       allowNull: false,
     },
     updated_at: {

@@ -5,11 +5,11 @@ const { authMiddleware } = require("../middlewares/index");
 /**
  * Lấy toàn bộ kết quả của người chơi (admin)
  */
-resultRouter.get("/", authMiddleware.verifyAccessToken, authMiddleware.verifyAdmin, resultController.getResults);
+resultRouter.get("/", authMiddleware.verifyTokens(["access_token"]), authMiddleware.verifyPiorities(["admin"]), resultController.getResults);
 
 /**
  * Lấy kết quả của người chơi có id (admin/user)
  */
-resultRouter.get("/:id", authMiddleware.verifyAccessToken, authMiddleware.verifyAdminOrBySelf, resultController.getResult);
+resultRouter.get("/:id", authMiddleware.verifyTokens(["access_token"]), authMiddleware.verifyPiorities(["admin", "user"]), resultController.getResult);
 
 module.exports = resultRouter;

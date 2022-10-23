@@ -9,7 +9,7 @@ const answerController = {
         attributes: ["turn"],
         order: [["turn", "DESC"]],
         where: {
-          user_id: parseInt(req.params.id),
+          user_id: req.user.id,
         },
       });
 
@@ -17,9 +17,9 @@ const answerController = {
 
       req.body.answers.forEach(async (answer) => {
         await Answer.create({
-          user_id: parseInt(req.user.id),
+          user_id: req.user.id,
           turn: newTurn,
-          question_id: parseInt(answer.question_id),
+          question_id: answer.question_id,
           choices: answer.choices,
         });
       });
@@ -33,7 +33,7 @@ const answerController = {
           },
         ],
         where: {
-          user_id: parseInt(req.params.id),
+          user_id: req.user.id,
           turn: newTurn,
         },
       });
@@ -50,7 +50,7 @@ const answerController = {
       });
 
       await Result.create({
-        user_id: parseInt(req.params.id),
+        user_id: req.user.id,
         turn: newTurn,
         total_correct: corrects.length,
         total_incorrect: incorrects.length,
@@ -59,9 +59,9 @@ const answerController = {
         incorrects: incorrects,
       });
 
-      responseUtility.response(res, 200, "Create answer successfully.", null);
+      return responseUtility.response(res, 200, "Create answer successfully.", null);
     } catch (err) {
-      responseUtility.response(res, 500, "Internal server error.", null);
+      return responseUtility.response(res, 500, "Internal server error.", null);
     }
   },
 
@@ -70,48 +70,56 @@ const answerController = {
       const answers = await Answer.findAll({
         attributes: ["question_id", "choices", "turn", "created_at"],
         where: {
-          user_id: parseInt(req.params.id),
+          user_id: req.params.id,
         },
       });
 
       if (!answers.length) {
-        responseUtility.response(res, 200, "Answer not found.", null);
+        return responseUtility.response(res, 200, "Answer not found.", null);
       } else {
-        responseUtility.response(res, 200, "Get answer successfully.", answers);
+        return responseUtility.response(res, 200, "Get answer successfully.", answers);
       }
     } catch (err) {
-      responseUtility.response(res, 500, "Internal server error.", null);
+      return responseUtility.response(res, 500, "Internal server error.", null);
     }
   },
 
   deleteAnswer: async (req, res) => {
     try {
-      const isAnswerValid = await Answer.findOne({
-        attributes: ["id"],
-        where: {
-          user_id: parseInt(req.params.id),
-        },
-      });
+      const userID = await Answer.findByPk(req.params.id);
 
-      if (!isAnswerValid) {
-        responseUtility.response(res, 404, "Answer not found.", null);
+      if (!userID) {
+        return responseUtility.response(res, 404, "Answer not found.", null);
       } else {
-        await Answer.destroy({
-          where: {
-            user_id: parseInt(req.params.id),
-          },
-        });
+        await Promise.all([
+          Answer.destroy({
+            where: {
+              user_id: userID,
+            },
+          }),
+          Result.destroy({
+            where: {
+              user_id: userID,
+            },
+          }),
+        ]);
 
-        await Result.destroy({
-          where: {
-            user_id: parseInt(req.params.id),
-          },
-        });
+        // await Answer.destroy({
+        //   where: {
+        //     user_id: userID,
+        //   },
+        // });
 
-        responseUtility.response(res, 200, "Delete answer successfully.", null);
+        // await Result.destroy({
+        //   where: {
+        //     user_id: userID,
+        //   },
+        // });
+
+        return responseUtility.response(res, 200, "Delete answer successfully.", null);
       }
     } catch (err) {
-      responseUtility.response(res, 500, "Internal server error.", null);
+      return responseUtility.response(res, 500, "Internal server error.", null);
     }
   },
 };

@@ -11,7 +11,7 @@ const generateAndStoreToken = async (res, type, payload, secret, expiresIn) => {
   const isTokenExist = await Token.findOne({
     attributes: ["id"],
     where: {
-      user_id: parseInt(payload.id),
+      user_id: payload.id,
       type: type,
     },
   });
@@ -19,7 +19,7 @@ const generateAndStoreToken = async (res, type, payload, secret, expiresIn) => {
   if (isTokenExist) {
     await Token.destroy({
       where: {
-        user_id: parseInt(payload.id),
+        user_id: payload.id,
         type: type,
       },
     });
@@ -28,23 +28,23 @@ const generateAndStoreToken = async (res, type, payload, secret, expiresIn) => {
   const newToken = await Token.create({
     value: jwt.sign(
       {
-        id: parseInt(payload.id),
-        role: payload.role,
+        id: payload.id,
+        roles: payload.roles,
       },
       secret,
       { expiresIn: expiresIn }
     ),
-    user_id: parseInt(payload.id),
+    user_id: payload.id,
     type: type,
     expired_in: expiresIn,
   });
 
-  res.cookie("access_token", newToken.value, {
+  res.cookie(type, newToken.value, {
     httpOnly: true,
     secure: false,
     path: "/",
     sameSite: "strict",
-    maxAge: expiresIn * 1000,
+    maxAge: expiresIn,
   });
 };
 
@@ -58,7 +58,7 @@ const authController = {
       });
 
       if (isEmailExist) {
-        responseUtility.response(res, 400, "Email already exists.", null);
+        return responseUtility.response(res, 400, "Email already exists.", null);
       } else {
         const { password, ...userInfor } = req.body;
 
@@ -67,12 +67,12 @@ const authController = {
           hashed_password: bcrypt.hashSync(req.body.password, 10),
         });
 
-        const { hashed_password, data } = newAccount;
+        const { hashed_password, ...data } = newAccount;
 
-        responseUtility.response(res, 200, "Create account successfully.", data);
+        return responseUtility.response(res, 200, "Create account successfully.", data);
       }
     } catch (err) {
-      responseUtility.response(res, 500, "Internal server error.", null);
+      return responseUtility.response(res, 500, "Internal server error.", null);
     }
   },
 
@@ -85,62 +85,81 @@ const authController = {
       });
 
       if (!account) {
-        responseUtility.response(res, 404, "Email does not exist.", null);
+        return responseUtility.response(res, 404, "Email does not exist.", null);
       }
 
       const isPasswordCorrect = bcrypt.compareSync(req.body.password, account.hashed_password);
 
       if (!isPasswordCorrect) {
-        responseUtility.response(res, 401, "Incorrect password.", null);
+        return responseUtility.response(res, 401, "Incorrect password.", null);
       }
 
       if (account && isPasswordCorrect) {
-        generateAndStoreToken(res, "access_token", account, process.env.ACCESS_TOKEN_SECRET, 60);
-        generateAndStoreToken(res, "refresh_token", account, process.env.REFRESH_TOKEN_SECRET, 15 * 60);
+        await generateAndStoreToken(res, "access_token", account, process.env.ACCESS_TOKEN_SECRET, process.env.ACCESS_TOKEN_TIMELIFE);
+        await generateAndStoreToken(res, "refresh_token", account, process.env.REFRESH_TOKEN_SECRET, process.env.REFRESH_TOKEN_TIMELIFE);
 
-        const { hashed_password, data } = account;
-
-        responseUtility.response(res, 200, "Logged in successfully.", data);
+        return responseUtility.response(res, 200, "Logged in successfully.", {
+          id: account.id,
+          full_name: account.full_name,
+          birthday: account.birthday,
+          sex: account.sex,
+          address: account.address,
+          phone: account.phone,
+          email: account.email,
+          roles: account.roles,
+          updated_at: account.updated_at,
+          created_at: account.created_at,
+        });
       }
     } catch (err) {
-      responseUtility.response(res, 500, "Internal server error.", null);
+      return responseUtility.response(res, 500, "Internal server error.", null);
     }
   },
 
   logoutAccount: async (req, res) => {
     try {
-      await Token.destroy({
+      const token = await Token.findOne({
         where: {
-          user_id: parseInt(req.params.id),
+          user_id: req.params.id,
         },
       });
 
-      res.clearCookie("refresh_token");
-      res.clearCookie("access_token");
+      if (!token) {
+        return responseUtility.response(res, 404, "User is not logged in.", null);
+      } else {
+        await Token.destroy({
+          where: {
+            user_id: req.params.id,
+          },
+        });
 
-      responseUtility.response(res, 200, "Logged out successfully.", null);
+        res.clearCookie("refresh_token");
+        res.clearCookie("access_token");
+
+        return responseUtility.response(res, 200, "Logged out successfully.", null);
+      }
     } catch (err) {
-      responseUtility.response(res, 500, "Internal server error.", null);
+      return responseUtility.response(res, 500, "Internal server error.", null);
     }
   },
 
   getAccessToken: async (req, res) => {
     try {
-      generateAndStoreToken(res, "access_token", account, process.env.ACCESS_TOKEN_SECRET, 60);
+      await generateAndStoreToken(res, "access_token", req.user, process.env.ACCESS_TOKEN_SECRET, process.env.ACCESS_TOKEN_TIMELIFE);
 
-      responseUtility.response(res, 200, "Get access token successfully.", null);
+      return responseUtility.response(res, 200, "Get access token successfully.", process.env.ACCESS_TOKEN_TIMELIFE);
     } catch (err) {
-      responseUtility.response(res, 500, "Internal server error.", null);
+      return responseUtility.response(res, 500, "Internal server error.", null);
     }
   },
 
   getRefreshToken: async (req, res) => {
     try {
-      generateAndStoreToken(res, "refresh_token", account, process.env.REFRESH_TOKEN_SECRET, 15 * 60);
+      await generateAndStoreToken(res, "refresh_token", req.user, process.env.REFRESH_TOKEN_SECRET, process.env.REFRESH_TOKEN_TIMELIFE);
 
-      responseUtility.response(res, 200, "Get refresh token successfully.", null);
+      return responseUtility.response(res, 200, "Get refresh token successfully.", process.env.REFRESH_TOKEN_TIMELIFE);
     } catch (err) {
-      responseUtility.response(res, 500, "Internal server error.", null);
+      return responseUtility.response(res, 500, "Internal server error.", null);
     }
   },
 };

@@ -1,83 +1,78 @@
 const dotenv = require("../configs/env.config");
 const { Token } = require("../models/index");
 const jwt = require("jsonwebtoken");
+const responseUtility = require("../utilities/response.utility");
 
 const authMiddleware = {
-  verifyAccessToken: async (req, res, next) => {
+  verifyTokens: (tokens) => async (req, res, next) => {
     try {
-      const isAccessTokenValid = await Token.findOne({
-        attributes: ["id"],
-        where: {
-          value: req.headers.access_token,
-        },
-      });
+      if (tokens.includes("refresh_token")) {
+        const isRefreshTokenValid = await Token.findOne({
+          attributes: ["id"],
+          where: {
+            value: req.headers.refresh_token,
+          },
+        });
 
-      if (!isAccessTokenValid) {
-        return res.status(401).json({ message: "Invalid refresh token.", data: null });
-      }
-
-      jwt.verify(req.headers.access_token, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
-        if (err) {
-          return res.status(401).json({ message: "Incorrect access token.", data: null });
+        if (!isRefreshTokenValid) {
+          return responseUtility.response(res, 401, "Invalid refresh token.", null);
         }
 
-        req.user = payload;
+        jwt.verify(req.headers.refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, payload) => {
+          if (err) {
+            return responseUtility.response(res, 401, "Incorrect refresh token.", null);
+          }
 
-        next();
-      });
-    } catch (err) {
-      return res.status(500).json({ message: "Internal server error.", data: null });
-    }
-  },
+          req.user = payload;
 
-  verifyAdmin: async (req, res, next) => {
-    try {
-      if (req.user.role === "admin") {
-        next();
-      } else {
-        return res.status(401).json({ message: "Permission denied.", data: null });
-      }
-    } catch (err) {
-      return res.status(500).json({ message: "Internal server error.", data: null });
-    }
-  },
-
-  verifyAdminOrBySelf: async (req, res, next) => {
-    try {
-      if (req.user.role == "admin" || req.user.id == req.params.id) {
-        next();
-      } else {
-        return res.status(401).json({ message: "Permission denied.", data: null });
-      }
-    } catch (err) {
-      return res.status(500).json({ message: "Internal server error.", data: null });
-    }
-  },
-
-  verifyRefreshToken: async (req, res, next) => {
-    try {
-      const isRefreshTokenValid = await Token.findOne({
-        attributes: ["id"],
-        where: {
-          value: req.headers.refresh_token,
-        },
-      });
-
-      if (!isRefreshTokenValid) {
-        return res.status(401).json({ message: "Invalid refresh token.", data: null });
+          next();
+        });
       }
 
-      jwt.verify(req.headers.refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, payload) => {
-        if (err) {
-          return res.status(401).json({ message: "Incorrect refresh token.", data: null });
+      if (tokens.includes("access_token")) {
+        const isAccessTokenValid = await Token.findOne({
+          attributes: ["id"],
+          where: {
+            value: req.headers.access_token,
+          },
+        });
+
+        if (!isAccessTokenValid) {
+          return responseUtility.response(res, 401, "Invalid access token.", null);
         }
 
-        req.user = payload;
+        jwt.verify(req.headers.access_token, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
+          if (err) {
+            return responseUtility.response(res, 401, "Incorrect access token.", null);
+          }
 
-        next();
-      });
+          req.user = payload;
+
+          next();
+        });
+      }
     } catch (err) {
-      return res.status(500).json({ message: "Internal server error.", data: null });
+      return responseUtility.response(res, 500, "Internal server error.", null);
+    }
+  },
+
+  verifyPiorities: (roles) => async (req, res, next) => {
+    try {
+      if (roles.includes("admin") && !req.user.roles.includes("admin")) {
+        return responseUtility.response(res, 401, "You are not admin.", null);
+      }
+
+      if (!roles.includes("admin") && roles.includes("user") && req.user.roles.includes("user") && req.user.id != req.params.id) {
+        return responseUtility.response(res, 401, "You are not user has this id.", null);
+      }
+
+      if (roles.includes("user") && !req.user.roles.includes("user")) {
+        return responseUtility.response(res, 401, "You are not user.", null);
+      }
+
+      next();
+    } catch (err) {
+      return responseUtility.response(res, 500, "Internal server error.", null);
     }
   },
 };

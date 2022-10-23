@@ -19,7 +19,17 @@ const Question = sequelize.define(
       allowNull: false,
       unique: true,
     },
+    question_image_links: {
+      type: Sequelize.ARRAY(Sequelize.TEXT),
+      defaultValue: [],
+      allowNull: false,
+    },
     options: {
+      type: Sequelize.ARRAY(Sequelize.TEXT),
+      defaultValue: [],
+      allowNull: false,
+    },
+    option_image_links: {
       type: Sequelize.ARRAY(Sequelize.TEXT),
       defaultValue: [],
       allowNull: false,
