@@ -1,4 +1,4 @@
-const responseUtility = require("../utilities/response.utility");
+const { responseUtility } = require("../utilities/index");
 
 const validationMiddleware = {
   validate: (schema) => (req, res, next) => {

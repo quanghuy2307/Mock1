@@ -1,7 +1,7 @@
 const { Question } = require("../models/index");
 const { Op } = require("sequelize");
-const { paginationUtility } = require("../utilities/index");
-const responseUtility = require("../utilities/response.utility");
+const { paginationUtility, responseUtility } = require("../utilities/index");
+const { cloudinary } = require("../configs/index");
 
 const questionController = {
   getQuestions: async (req, res) => {
@@ -10,7 +10,7 @@ const questionController = {
       const { limit, offset } = paginationUtility.getPagination(parseInt(page), parseInt(size));
 
       const data = await Question.findAndCountAll({
-        attributes: ["id", "question", "options", "updated_at", "created_at"],
+        attributes: ["id", "question", "question_image_links", "options", "option_image_links", "updated_at", "created_at"],
         where: (condition = question ? { question: { [Op.like]: `%${question}%` } } : null),
         offset: offset,
         limit: limit,
@@ -40,6 +40,8 @@ const questionController = {
       if (isQuestionValid) {
         responseUtility.response(res, 400, "Question already exists.", null);
       } else {
+        const imgs = await cloudinary.uploader.upload(req.files.path);
+
         const newQuestion = await Question.create({
           question: req.body.question,
           options: req.body.options,
@@ -56,7 +58,7 @@ const questionController = {
   getQuestion: async (req, res) => {
     try {
       const question = await Question.findOne({
-        attributes: ["id", "question", "options", "updated_at", "created_at"],
+        attributes: ["id", "question", "question_image_links", "options", "option_image_links", "updated_at", "created_at"],
         where: {
           id: req.params.id,
         },

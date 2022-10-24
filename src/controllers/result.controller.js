@@ -1,5 +1,5 @@
 const { Result } = require("../models/index");
-const responseUtility = require("../utilities/response.utility");
+const { responseUtility } = require("../utilities/index");
 
 const resultController = {
   getResults: async (req, res) => {

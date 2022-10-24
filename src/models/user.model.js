@@ -18,6 +18,11 @@ const User = sequelize.define(
       type: Sequelize.STRING(50),
       allowNull: false,
     },
+    avatar_link: {
+      type: Sequelize.TEXT,
+      defaultValue: "",
+      allowNull: false,
+    },
     birthday: {
       type: Sequelize.DATE,
       allowNull: false,

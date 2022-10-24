@@ -2,6 +2,7 @@ const userRouter = require("express").Router();
 const { userController } = require("../controllers/index");
 const { authMiddleware, validationMiddleware } = require("../middlewares/index");
 const { userValidation } = require("../validations/index");
+const { upload } = require("../configs/index");
 
 /**
  * Lấy tất cả user (admin)
@@ -16,7 +17,7 @@ userRouter.get("/:id", authMiddleware.verifyTokens(["access_token"]), authMiddle
 /**
  * Cập nhật user (admin/user)
  */
-userRouter.put("/:id", authMiddleware.verifyTokens(["access_token"]), authMiddleware.verifyPiorities(["admin", "user"]), validationMiddleware.validate(userValidation.updateUser), userController.updateUser);
+userRouter.put("/:id", authMiddleware.verifyTokens(["access_token"]), authMiddleware.verifyPiorities(["admin", "user"]), upload.single("avatar"), validationMiddleware.validate(userValidation.updateUser), userController.updateUser);
 
 /**
  * Xóa user (admin)

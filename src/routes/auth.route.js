@@ -1,11 +1,12 @@
 const authRouter = require("express").Router();
 const { authController } = require("../controllers/index");
 const { authMiddleware } = require("../middlewares/index");
+const { upload } = require("../configs/index");
 
 /**
  * Đăng ký tài khoản user
  */
-authRouter.post("/register", authController.registerAccount);
+authRouter.post("/register", upload.single("avatar"), authController.registerAccount);
 
 /**
  * Đăng nhập

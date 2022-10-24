@@ -1,8 +1,8 @@
-const dotenv = require("../configs/env.config");
 const { User, Token } = require("../models/index");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const responseUtility = require("../utilities/response.utility");
+const responseUtility = require("../utilities/index");
+const { dotenv, cloudinary } = require("../configs/index");
 
 /**
  * Tạo token rồi lưu vào DB và cookie
@@ -62,14 +62,29 @@ const authController = {
       } else {
         const { password, ...userInfor } = req.body;
 
+        const avatar = await cloudinary.uploader.upload(req.file.path);
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
         const newAccount = await User.create({
           ...userInfor,
-          hashed_password: bcrypt.hashSync(req.body.password, 10),
+          avatar_link: avatar.secure_url,
+          hashed_password: hashedPassword,
         });
 
-        const { hashed_password, ...data } = newAccount;
-
-        return responseUtility.response(res, 200, "Create account successfully.", data);
+        return responseUtility.response(res, 200, "Create account successfully.", {
+          id: newAccount.id,
+          full_name: newAccount.full_name,
+          avatar_link: newAccount.avatar_link,
+          birthday: newAccount.birthday,
+          sex: newAccount.sex,
+          address: newAccount.address,
+          phone: newAccount.phone,
+          email: newAccount.email,
+          roles: newAccount.roles,
+          updated_at: newAccount.updated_at,
+          created_at: newAccount.created_at,
+        });
       }
     } catch (err) {
       return responseUtility.response(res, 500, "Internal server error.", null);
@@ -88,8 +103,7 @@ const authController = {
         return responseUtility.response(res, 404, "Email does not exist.", null);
       }
 
-      const isPasswordCorrect = bcrypt.compareSync(req.body.password, account.hashed_password);
-
+      const isPasswordCorrect = await bcrypt.compare(req.body.password, account.hashed_password);
       if (!isPasswordCorrect) {
         return responseUtility.response(res, 401, "Incorrect password.", null);
       }
@@ -101,6 +115,7 @@ const authController = {
         return responseUtility.response(res, 200, "Logged in successfully.", {
           id: account.id,
           full_name: account.full_name,
+          avatar_link: account.avatar_link,
           birthday: account.birthday,
           sex: account.sex,
           address: account.address,

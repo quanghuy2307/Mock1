@@ -1,13 +1,8 @@
 const express = require("express");
-const dotenv = require("./configs/env.config");
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
-const sequelize = require("./configs/db.config");
 
-const multer = require("multer");
-const upload = multer({
-  dest: "./uploads/imgs/",
-});
+const { dotenv, sequelize } = require("./configs/index");
 
 const app = express();
 
@@ -30,10 +25,6 @@ app.use("/survey/result", resultRouter);
 app.use("/survey/question", questionRouter);
 app.use("/survey/answer", answerRouter);
 app.use("/survey/", homeRouter);
-
-app.post("/upload_file", upload.single("file"), (req, res) => {
-  res.json({ body: req.body, file: req.file });
-});
 
 /**
  *

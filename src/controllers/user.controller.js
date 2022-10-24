@@ -1,8 +1,8 @@
 const { User } = require("../models/index");
 const { Op } = require("sequelize");
-const { paginationUtility } = require("../utilities/index");
+const { paginationUtility, responseUtility } = require("../utilities/index");
 const bcrypt = require("bcrypt");
-const responseUtility = require("../utilities/response.utility");
+const { cloudinary } = require("../configs/index");
 
 const userController = {
   getUsers: async (req, res) => {
@@ -11,7 +11,7 @@ const userController = {
       const { limit, offset } = paginationUtility.getPagination(parseInt(page), parseInt(size));
 
       const data = await User.findAndCountAll({
-        attributes: ["id", "full_name", "birthday", "sex", "address", "phone", "email", "roles", "updated_at", "created_at"],
+        attributes: ["id", "full_name", "avatar_link", "birthday", "sex", "address", "phone", "email", "roles", "updated_at", "created_at"],
         where: (condition = full_name ? { full_name: { [Op.like]: `%${full_name}%` } } : null),
         offset: offset,
         limit: limit,
@@ -32,7 +32,7 @@ const userController = {
   getUser: async (req, res) => {
     try {
       const userInfor = await User.findOne({
-        attributes: ["id", "full_name", "birthday", "sex", "address", "phone", "email", "roles", "updated_at", "created_at"],
+        attributes: ["id", "full_name", "avatar_link", "birthday", "sex", "address", "phone", "email", "roles", "updated_at", "created_at"],
         where: {
           id: req.params.id,
         },
@@ -57,10 +57,15 @@ const userController = {
       } else {
         const { password, ...userInfor } = req.body;
 
+        const avatar = await cloudinary.uploader.upload(req.file.path);
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
         await User.update(
           {
             ...userInfor,
-            hashed_password: bcrypt.hashSync(password, 10),
+            avatar_link: avatar.secure_url,
+            hashed_password: hashedPassword,
             updated_at: Date.now(),
           },
           {
@@ -71,7 +76,7 @@ const userController = {
         );
 
         const newUserInfor = await User.findOne({
-          attributes: ["id", "full_name", "birthday", "sex", "address", "phone", "email", "roles", "updated_at", "created_at"],
+          attributes: ["id", "full_name", "avatar_link", "birthday", "sex", "address", "phone", "email", "roles", "updated_at", "created_at"],
           where: {
             id: req.params.id,
           },

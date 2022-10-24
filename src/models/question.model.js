@@ -30,7 +30,7 @@ const Question = sequelize.define(
       allowNull: false,
     },
     option_image_links: {
-      type: Sequelize.ARRAY(Sequelize.TEXT),
+      type: Sequelize.ARRAY(Sequelize.ARRAY(Sequelize.TEXT)),
       defaultValue: [],
       allowNull: false,
     },

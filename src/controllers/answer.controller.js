@@ -1,6 +1,6 @@
 const { Answer, Result, Question } = require("../models/index");
 const _ = require("lodash");
-const responseUtility = require("../utilities/response.utility");
+const responseUtility = require("../utilities/index");
 
 const answerController = {
   createAnswer: async (req, res) => {

@@ -1,7 +1,7 @@
-const dotenv = require("../configs/env.config");
+const { dotenv } = require("../configs/index");
 const { Token } = require("../models/index");
 const jwt = require("jsonwebtoken");
-const responseUtility = require("../utilities/response.utility");
+const { responseUtility } = require("../utilities/index");
 
 const authMiddleware = {
   verifyTokens: (tokens) => async (req, res, next) => {
