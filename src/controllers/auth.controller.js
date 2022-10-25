@@ -1,7 +1,7 @@
 const { User, Token } = require("../models/index");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const responseUtility = require("../utilities/index");
+const { responseUtility } = require("../utilities/index");
 const { dotenv, cloudinary } = require("../configs/index");
 
 /**

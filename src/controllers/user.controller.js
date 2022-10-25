@@ -8,7 +8,7 @@ const userController = {
   getUsers: async (req, res) => {
     try {
       const { page, size, full_name } = req.query;
-      const { limit, offset } = paginationUtility.getPagination(parseInt(page), parseInt(size));
+      const { limit, offset } = paginationUtility.getPagination(page, size);
 
       const data = await User.findAndCountAll({
         attributes: ["id", "full_name", "avatar_link", "birthday", "sex", "address", "phone", "email", "roles", "updated_at", "created_at"],
@@ -41,7 +41,7 @@ const userController = {
       if (!userInfor) {
         return responseUtility.response(res, 404, "User not found.", null);
       } else {
-        return responseUtility.response(res, 200, "Get user successfully.", userInfor);
+        return responseUtility.response(res, 200, "Get user successfully.", userInfor.dataValues);
       }
     } catch (err) {
       return responseUtility.response(res, 500, "Internal server error.", null);
@@ -50,9 +50,9 @@ const userController = {
 
   updateUser: async (req, res) => {
     try {
-      const userID = await User.findByPk(parseInt(req.params.id));
+      const isUserExist = await User.findByPk(req.params.id);
 
-      if (!userID) {
+      if (!isUserExist) {
         return responseUtility.response(res, 404, "User not found.", null);
       } else {
         const { password, ...userInfor } = req.body;
@@ -70,7 +70,7 @@ const userController = {
           },
           {
             where: {
-              id: userID,
+              id: req.params.id,
             },
           }
         );
@@ -82,7 +82,7 @@ const userController = {
           },
         });
 
-        return responseUtility.response(res, 200, "Update user successfully.", newUserInfor);
+        return responseUtility.response(res, 200, "Update user successfully.", newUserInfor.dataValues);
       }
     } catch (err) {
       return responseUtility.response(res, 500, "Internal server error.", null);
@@ -91,31 +91,19 @@ const userController = {
 
   deleteUser: async (req, res) => {
     try {
-      const userID = await User.findByPk(parseInt(req.params.id));
+      const isUserExist = await User.findByPk(req.params.id);
 
-      if (!userID) {
+      if (!isUserExist) {
         return responseUtility.response(res, 404, "User not found.", null);
       } else {
         await User.destroy({
           where: {
-            id: userID,
+            id: req.params.id,
           },
         });
 
         return responseUtility.response(res, 200, "Delete user successfully.", null);
       }
-    } catch (err) {
-      return responseUtility.response(res, 500, "Internal server error.", null);
-    }
-  },
-
-  deleteUsers: async (req, res) => {
-    try {
-      await User.destroy({
-        truncate: true,
-      });
-
-      return responseUtility.response(res, 200, "Delete users successfully.", null);
     } catch (err) {
       return responseUtility.response(res, 500, "Internal server error.", null);
     }

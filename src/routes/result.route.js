@@ -8,7 +8,7 @@ const { authMiddleware } = require("../middlewares/index");
 resultRouter.get("/", authMiddleware.verifyTokens(["access_token"]), authMiddleware.verifyPiorities(["admin"]), resultController.getResults);
 
 /**
- * Lấy kết quả của người chơi có id (admin/user)
+ * Lấy kết quả của 1 người chơi (admin/user)
  */
 resultRouter.get("/:id", authMiddleware.verifyTokens(["access_token"]), authMiddleware.verifyPiorities(["admin", "user"]), resultController.getResult);
 

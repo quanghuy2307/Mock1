@@ -1,5 +1,8 @@
 const paginationUtility = {
   getPagination: (page, size) => {
+    page = parseInt(page);
+    size = parseInt(size);
+
     const limit = size ? size : 1;
     const offset = page ? (page - 1) * limit : 0;
 

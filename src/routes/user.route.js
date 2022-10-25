@@ -10,17 +10,17 @@ const { upload } = require("../configs/index");
 userRouter.get("/", authMiddleware.verifyTokens(["access_token"]), authMiddleware.verifyPiorities(["admin"]), validationMiddleware.validate(userValidation.getUsers), userController.getUsers);
 
 /**
- * Lấy thông tin user (admin/user)
+ * Lấy thông tin 1 user (admin/user)
  */
 userRouter.get("/:id", authMiddleware.verifyTokens(["access_token"]), authMiddleware.verifyPiorities(["admin", "user"]), validationMiddleware.validate(userValidation.getUser), userController.getUser);
 
 /**
- * Cập nhật user (admin/user)
+ * Cập nhật 1 user (admin/user)
  */
 userRouter.put("/:id", authMiddleware.verifyTokens(["access_token"]), authMiddleware.verifyPiorities(["admin", "user"]), upload.single("avatar"), validationMiddleware.validate(userValidation.updateUser), userController.updateUser);
 
 /**
- * Xóa user (admin)
+ * Xóa 1 user (admin)
  */
 userRouter.delete("/:id", authMiddleware.verifyTokens(["access_token"]), authMiddleware.verifyPiorities(["admin"]), validationMiddleware.validate(userValidation.deleteUser), userController.deleteUser);
 
